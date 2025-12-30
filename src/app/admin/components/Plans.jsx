@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { toast, Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
+
+const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans";
 
 const Plans = () => {
   const [plans, setPlans] = useState([]);
@@ -12,6 +16,37 @@ const Plans = () => {
     duration: "",
     dailyEarning: "",
   });
+  const [loading, setLoading] = useState(false);
+
+  const token = Cookies.get("token");
+
+  // ======================
+  // Fetch Plans from backend
+  // ======================
+  const fetchPlans = async () => {
+    if (!token) return toast.error("Admin not authenticated");
+    try {
+      setLoading(true);
+      const res = await fetch(BACKEND_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPlans(data.plans || []);
+      } else {
+        toast.error(data.message || "Failed to fetch plans");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error fetching plans");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
 
   // ======================
   // Open Modal
@@ -26,33 +61,71 @@ const Plans = () => {
   // ======================
   // Create / Update Plan
   // ======================
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) return toast.error("Admin not authenticated");
 
     if (!formData.totalPrice || !formData.duration || !formData.dailyEarning) {
-      alert("All fields are required");
-      return;
+      return toast.error("All fields are required");
     }
 
-    if (currentPlan) {
-      setPlans(prev =>
-        prev.map(p => (p.id === currentPlan.id ? { ...p, ...formData } : p))
-      );
-    } else {
-      setPlans(prev => [...prev, { ...formData, id: Date.now().toString() }]);
-    }
+    try {
+      const method = currentPlan ? "PUT" : "POST";
+      const body = currentPlan
+        ? JSON.stringify({ id: currentPlan._id, ...formData })
+        : JSON.stringify(formData);
 
-    setModalOpen(false);
-    setCurrentPlan(null);
-    setFormData({ totalPrice: "", duration: "", dailyEarning: "" });
+      const res = await fetch(BACKEND_URL, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(currentPlan ? "Plan updated" : "Plan created");
+        fetchPlans();
+        setModalOpen(false);
+        setCurrentPlan(null);
+      } else {
+        toast.error(data.message || "Failed to save plan");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    }
   };
 
   // ======================
   // Delete Plan
   // ======================
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    if (!token) return toast.error("Admin not authenticated");
     if (!confirm("Are you sure you want to delete this plan?")) return;
-    setPlans(prev => prev.filter(p => p.id !== id));
+
+    try {
+      const res = await fetch(BACKEND_URL, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Plan deleted");
+        fetchPlans();
+      } else {
+        toast.error(data.message || "Failed to delete plan");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error deleting plan");
+    }
   };
 
   // ======================
@@ -66,6 +139,8 @@ const Plans = () => {
 
   return (
     <div className="sm:p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+      <Toaster position="top-right" />
+
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Plans</h1>
         <button
@@ -95,7 +170,13 @@ const Plans = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredPlans.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="text-center py-4 text-gray-500 dark:text-gray-300">
+                  Loading plans...
+                </td>
+              </tr>
+            ) : filteredPlans.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-4 text-gray-500 dark:text-gray-300">
                   No plans found
@@ -103,7 +184,7 @@ const Plans = () => {
               </tr>
             ) : (
               filteredPlans.map(plan => (
-                <tr key={plan.id}>
+                <tr key={plan._id}>
                   <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">${plan.totalPrice}</td>
                   <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">{plan.duration} days</td>
                   <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">${plan.dailyEarning}</td>
@@ -115,7 +196,7 @@ const Plans = () => {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(plan.id)}
+                      onClick={() => handleDelete(plan._id)}
                       className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     >
                       Delete
