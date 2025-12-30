@@ -14,85 +14,98 @@ const LuckDraw = () => {
     participants: "",
     winner: "",
   });
+  const LUCKYDRAW_URL = "https://treazoxbackend.vercel.app/api/luckydraw/";
 
-  const token = Cookies.get("token"); // kept for reference if backend is added
+  const token = Cookies.get("token");
 
-  // ===== Fetch Dummy Lucky Draws =====
-  const fetchLuckyDraws = () => {
-    // Dummy data if backend is not ready
-    const dummyDraws = [
-      { _id: "1", buyPrice: 50, winningPrice: 500, participantsLimit: 20, winnersCount: 1 },
-      { _id: "2", buyPrice: 100, winningPrice: 1000, participantsLimit: 50, winnersCount: 1 },
-    ];
-    setLuckyDraws(dummyDraws);
+  /* ================= FETCH ALL LUCKY DRAWS ================= */
+  const fetchLuckyDraws = async () => {
+    try {
+      const res = await fetch(`${LUCKYDRAW_URL}admin`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      setLuckyDraws(data.draws || []);
+    } catch (err) {
+      toast.error(err.message || "Failed to load lucky draws");
+    }
   };
 
   useEffect(() => {
     fetchLuckyDraws();
   }, []);
 
-  // ===== Handle Input Change =====
+  /* ================= INPUT HANDLER ================= */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ===== Create / Update Lucky Draw =====
-  const handleSubmit = () => {
-    const { buyPrice, winningPrice, participants } = formData;
+  /* ================= CREATE / UPDATE ================= */
+  const handleSubmit = async () => {
+    const { buyPrice, winningPrice, participants, winner } = formData;
+
     if (!buyPrice || !winningPrice || !participants) {
       toast.error("All required fields must be filled");
       return;
     }
 
-    if (editIndex !== null) {
-      // Update existing
-      const updatedDraws = [...luckyDraws];
-      updatedDraws[editIndex] = {
-        ...updatedDraws[editIndex],
+    try {
+      const body = {
         buyPrice,
         winningPrice,
         participantsLimit: participants,
-        winnersCount: formData.winner || updatedDraws[editIndex].winnersCount,
+        winnersCount: winner || 1,
+        endDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // default 24h
       };
-      setLuckyDraws(updatedDraws);
-      toast.success("Lucky Draw updated");
-    } else {
-      // Create new
-      const newDraw = {
-        _id: Date.now().toString(),
-        buyPrice,
-        winningPrice,
-        participantsLimit: participants,
-        winnersCount: formData.winner || 0,
-      };
-      setLuckyDraws(prev => [...prev, newDraw]);
+
+      const res = await fetch(LUCKYDRAW_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
       toast.success("Lucky Draw created");
+      resetForm();
+      fetchLuckyDraws();
+    } catch (err) {
+      toast.error(err.message || "Failed to create lucky draw");
     }
-
-    resetForm();
   };
 
-  // ===== Edit Lucky Draw =====
-  const handleEdit = (index) => {
-    const draw = luckyDraws[index];
-    setFormData({
-      buyPrice: draw.buyPrice,
-      winningPrice: draw.winningPrice,
-      participants: draw.participantsLimit,
-      winner: draw.winnersCount,
-    });
-    setEditIndex(index);
-    setShowModal(true);
-  };
-
-  // ===== Delete Lucky Draw =====
-  const handleDelete = (index) => {
+  /* ================= DELETE ================= */
+  const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this lucky draw?")) return;
-    setLuckyDraws(prev => prev.filter((_, i) => i !== index));
-    toast.success("Lucky Draw deleted");
+
+    try {
+      const res = await fetch(`${LUCKYDRAW_URL}${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      toast.success("Lucky Draw deleted");
+      fetchLuckyDraws();
+    } catch (err) {
+      toast.error(err.message || "Delete failed");
+    }
   };
 
-  // ===== Reset Form =====
+  /* ================= RESET ================= */
   const resetForm = () => {
     setFormData({ buyPrice: "", winningPrice: "", participants: "", winner: "" });
     setEditIndex(null);
@@ -124,39 +137,33 @@ const LuckDraw = () => {
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Buy Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winning Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Participants</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winner</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winners</th>
               <th className="px-6 py-3 text-center text-xs font-medium uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {luckyDraws.length === 0 ? (
-              <tr className="dark:text-white">
-                <td colSpan={5} className="text-center py-4 text-gray-500 dark:text-gray-300">
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-gray-500">
                   No Lucky Draw Found
                 </td>
               </tr>
             ) : (
-              luckyDraws.map((item, index) => (
+              luckyDraws.map((item) => (
                 <tr key={item._id} className="dark:text-white">
-                  <td className="px-6 py-4 text-sm">{item.buyPrice}</td>
-                  <td className="px-6 py-4 text-sm">{item.winningPrice}</td>
-                  <td className="px-6 py-4 text-sm">{item.participantsLimit}</td>
-                  <td className="px-6 py-4 text-sm">{item.winnersCount || "Not Selected"}</td>
+                  <td className="px-6 py-4">{item.buyPrice}</td>
+                  <td className="px-6 py-4">{item.winningPrice}</td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-row gap-2 justify-center">
-                      <button
-                        onClick={() => handleEdit(index)}
-                        className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(index)}
-                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    {item.participants.length}/{item.participantsLimit}
+                  </td>
+                  <td className="px-6 py-4">{item.winnersCount}</td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))
@@ -169,57 +176,23 @@ const LuckDraw = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-3">
           <div className="bg-white dark:bg-gray-800 p-5 rounded w-full max-w-md">
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-gray-900 dark:text-white">
-              {editIndex !== null ? "Edit Lucky Draw" : "Create Lucky Draw"}
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              Create Lucky Draw
             </h2>
 
             <div className="space-y-3">
-              <input
-                type="number"
-                name="buyPrice"
-                placeholder="Buy Price"
-                className="w-full px-3 py-2 border rounded"
-                value={formData.buyPrice}
-                onChange={handleChange}
-              />
-              <input
-                type="number"
-                name="winningPrice"
-                placeholder="Winning Price"
-                className="w-full px-3 py-2 border rounded"
-                value={formData.winningPrice}
-                onChange={handleChange}
-              />
-              <input
-                type="number"
-                name="participants"
-                placeholder="Number of Participants"
-                className="w-full px-3 py-2 border rounded"
-                value={formData.participants}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="winner"
-                placeholder="Winner (optional)"
-                className="w-full px-3 py-2 border rounded"
-                value={formData.winner}
-                onChange={handleChange}
-              />
+              <input type="number" name="buyPrice" placeholder="Buy Price" className="w-full px-3 py-2 border rounded" value={formData.buyPrice} onChange={handleChange} />
+              <input type="number" name="winningPrice" placeholder="Winning Price" className="w-full px-3 py-2 border rounded" value={formData.winningPrice} onChange={handleChange} />
+              <input type="number" name="participants" placeholder="Participants Limit" className="w-full px-3 py-2 border rounded" value={formData.participants} onChange={handleChange} />
+              <input type="number" name="winner" placeholder="Number of Winners" className="w-full px-3 py-2 border rounded" value={formData.winner} onChange={handleChange} />
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-5">
-              <button
-                onClick={resetForm}
-                className="w-full sm:w-auto px-4 py-2 bg-gray-400 text-white rounded"
-              >
+            <div className="flex justify-end gap-3 mt-5">
+              <button onClick={resetForm} className="px-4 py-2 bg-gray-400 text-white rounded">
                 Cancel
               </button>
-              <button
-                onClick={handleSubmit}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                {editIndex !== null ? "Update" : "Create"}
+              <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">
+                Create
               </button>
             </div>
           </div>
