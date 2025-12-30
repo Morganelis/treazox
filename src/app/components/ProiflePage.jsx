@@ -102,7 +102,7 @@ const ProfilePage = () => {
           <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
             <p className="text-sm text-gray-500">Total Assets</p>
             <p className="font-semibold text-green-500 text-lg">
-              ${user.totalAssets || 0}
+              ${user.balance + user.commissionBalance}
             </p>
           </div>
           <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">

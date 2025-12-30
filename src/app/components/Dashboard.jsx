@@ -134,7 +134,7 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
           <p className="text-gray-500">Total Assets</p>
           <h2 className="text-3xl font-bold text-green-600 mb-6">
-            ${dashboard.totalAssets}
+            ${dashboard.availableBalance + commissionBalance}
           </h2>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
@@ -146,7 +146,7 @@ const Dashboard = () => {
             </div>
 
             <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-              <p className="text-sm text-gray-500">Commission Balance</p>
+              <p className="text-sm text-gray-500">Team Income</p>
               <p className="font-semibold text-green-500">
                 ${commissionBalance}
               </p>
@@ -170,27 +170,29 @@ const Dashboard = () => {
         </div>
 
         {/* ================= TABS ================= */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { id: "account", label: "Account History", icon: FileText },
-            { id: "withdraw", label: "Withdraw History", icon: Wallet },
-            { id: "lucky", label: "Lucky Draw", icon: Gift },
-            // { id: "referral", label: "Referral History", icon: Copy },
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`p-4 rounded-lg shadow flex flex-col items-center gap-1 ${
-                activeTab === id
-                  ? "border border-green-300 text-green-500"
-                  : "bg-white dark:bg-gray-800 text-primary dark:text-white"
-              }`}
-            >
-              <Icon className="w-5 h-5 text-blue-600" />
-              <span className="text-sm">{label}</span>
-            </button>
-          ))}
-        </div>
+       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+  {[
+    { id: "account", label: "Account History", icon: FileText },
+    { id: "withdraw", label: "Withdraw History", icon: Wallet },
+    { id: "lucky", label: "Treasure Gift Cards", icon: Gift },
+    // { id: "referral", label: "Referral History", icon: Copy },
+  ].map(({ id, label, icon: Icon }) => (
+    <button
+      key={id}
+      onClick={() => setActiveTab(id)}
+      className={`p-4 rounded-lg shadow flex flex-col items-center gap-1 transition-colors duration-200 
+        ${
+          activeTab === id
+            ? "border border-green-300 text-green-500 bg-white dark:bg-gray-800"
+            : "bg-white dark:bg-gray-800 text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+        }
+      `}
+    >
+      <Icon className="w-5 h-5 text-blue-600" />
+      <span className="text-sm text-center">{label}</span>
+    </button>
+  ))}
+</div>
 
         {/* ================= TABLE ================= */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
