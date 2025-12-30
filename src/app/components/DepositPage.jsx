@@ -21,13 +21,40 @@ const DepositPage = () => {
   const [selectedExchange, setSelectedExchange] = useState(EXCHANGES[0]);
   const [trxId, setTrxId] = useState("");
   const [token, setToken] = useState("");
+const BALANCE_URL = "https://treazoxbackend.vercel.app/api/users/me";
+const DEPOSIT_URL = "https://treazoxbackend.vercel.app/api/deposit/";
+
+
+
+  const [loadingAssets, setLoadingAssets] = useState(true);
+
+  // Fetch user balance/assets
+  const fetchAssets = async () => {
+    
+    const userToken = Cookies.get("token");
+    if (!userToken) return;
+
+    setToken(userToken);
+    try {
+      const res = await fetch(BALANCE_URL, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch balance");
+
+      setAssets(data.user.balance);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to fetch balance");
+    } finally {
+      setLoadingAssets(false);
+    }
+  };
 
   useEffect(() => {
-    const userToken = Cookies.get("token");
-    if (userToken) setToken(userToken);
-
-    // dummy assets (replace later)
-    setAssets(12450);
+    fetchAssets();
   }, []);
 
   const amount = selectedAmount || Number(customAmount || 0);
@@ -35,22 +62,18 @@ const DepositPage = () => {
   const total = amount ? Number((amount + fee).toFixed(2)) : 0;
 
   const handleDeposit = async () => {
-    if (!amount || amount <= 0) {
-      return toast.error("Please select or enter deposit amount");
-    }
-    if (!trxId) {
-      return toast.error("Please enter transaction ID");
-    }
+    if (!amount || amount <= 0) return toast.error("Please select or enter deposit amount");
+    if (!trxId) return toast.error("Please enter transaction ID");
 
     try {
-      const res = await fetch("/api/deposit", {
+      const res = await fetch(DEPOSIT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          amount, // base amount only
+          amount,
           exchange: JSON.stringify(selectedExchange),
           trxId,
         }),
@@ -59,12 +82,15 @@ const DepositPage = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Deposit failed");
 
-      toast.success("Deposit submitted successfully!");
+      toast.success("Deposit submitted successfully! Waiting for admin approval");
       setSelectedAmount(null);
       setCustomAmount("");
       setTrxId("");
+
+      // Optionally refresh assets after some time or when admin approves
+      fetchAssets();
     } catch (err) {
-      console.error("Deposit error:", err);
+      console.error(err);
       toast.error(err.message || "Deposit failed");
     }
   };
@@ -75,115 +101,117 @@ const DepositPage = () => {
 
       <div className="max-w-[1170px] mx-auto ">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        Deposit Funds
-      </h1>
+          Deposit Funds
+        </h1>
 
-      {/* Assets */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
-        <p className="text-gray-500">Current Assets</p>
-        <h2 className="text-3xl font-bold text-green-600">${assets}</h2>
-      </div>
-
-      {/* Amount */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
-        <p className="text-gray-500 mb-2">Select Deposit Amount</p>
-
-        <div className="flex flex-wrap gap-3 mb-4">
-          {DEPOSIT_OPTIONS.map((amt) => (
-            <button
-              key={amt}
-              onClick={() => {
-                setSelectedAmount(amt);
-                setCustomAmount("");
-              }}
-              className={`px-4 py-2 rounded-lg border ${
-                selectedAmount === amt
-                  ? "bg-green-600 text-white border-green-600"
-                  : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white"
-              }`}
-            >
-              ${amt}
-            </button>
-          ))}
+        {/* Assets */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+          <p className="text-gray-500">Current Assets</p>
+          <h2 className="text-3xl font-bold text-green-600">
+            {loadingAssets ? "Loading..." : `$${assets}`}
+          </h2>
         </div>
 
-        <input
-          type="number"
-          placeholder="Or enter custom amount"
-          value={customAmount}
-          onChange={(e) => {
-            setCustomAmount(e.target.value);
-            setSelectedAmount(null);
-          }}
-          className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+        {/* Amount */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+          <p className="text-gray-500 mb-2">Select Deposit Amount</p>
 
-      {/* Fee Preview */}
-      {amount > 0 && (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 mb-6">
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-            <span>Deposit Amount</span>
-            <span>${amount.toFixed(2)}</span>
+          <div className="flex flex-wrap gap-3 mb-4">
+            {DEPOSIT_OPTIONS.map((amt) => (
+              <button
+                key={amt}
+                onClick={() => {
+                  setSelectedAmount(amt);
+                  setCustomAmount("");
+                }}
+                className={`px-4 py-2 rounded-lg border ${
+                  selectedAmount === amt
+                    ? "bg-green-600 text-white border-green-600"
+                    : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white"
+                }`}
+              >
+                ${amt}
+              </button>
+            ))}
           </div>
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mt-1">
-            <span>Deposit Fee ({DEPOSIT_FEE_PERCENT}%)</span>
-            <span>${fee.toFixed(2)}</span>
+
+          <input
+            type="number"
+            placeholder="Or enter custom amount"
+            value={customAmount}
+            onChange={(e) => {
+              setCustomAmount(e.target.value);
+              setSelectedAmount(null);
+            }}
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Fee Preview */}
+        {amount > 0 && (
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 mb-6">
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
+              <span>Deposit Amount</span>
+              <span>${amount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mt-1">
+              <span>Deposit Fee ({DEPOSIT_FEE_PERCENT}%)</span>
+              <span>${fee.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between font-semibold text-lg text-gray-800 dark:text-white mt-2">
+              <span>Total Payable</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
           </div>
-          <div className="flex justify-between font-semibold text-lg text-gray-800 dark:text-white mt-2">
-            <span>Total Payable</span>
-            <span>${total.toFixed(2)}</span>
+        )}
+
+        {/* Exchange */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+          <p className="text-gray-500 mb-2">Select Exchange / Chain</p>
+
+          <div className="flex flex-wrap gap-3 mb-4">
+            {EXCHANGES.map((ex) => (
+              <button
+                key={ex.name}
+                onClick={() => setSelectedExchange(ex)}
+                className={`px-4 py-2 rounded-lg border ${
+                  selectedExchange.name === ex.name
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white"
+                }`}
+              >
+                {ex.name}
+              </button>
+            ))}
           </div>
-        </div>
-      )}
 
-      {/* Exchange */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
-        <p className="text-gray-500 mb-2">Select Exchange / Chain</p>
+          <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg mb-4">
+            <p className="text-sm text-gray-500 mb-1">Address</p>
+            <p className="font-mono text-gray-700 dark:text-green-500 break-all">
+              {selectedExchange.address}
+            </p>
+            <p className="text-sm text-gray-500 mt-2">Network</p>
+            <p className="font-semibold text-gray-700 dark:text-green-500">
+              {selectedExchange.network}
+            </p>
+          </div>
 
-        <div className="flex flex-wrap gap-3 mb-4">
-          {EXCHANGES.map((ex) => (
-            <button
-              key={ex.name}
-              onClick={() => setSelectedExchange(ex)}
-              className={`px-4 py-2 rounded-lg border ${
-                selectedExchange.name === ex.name
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white"
-              }`}
-            >
-              {ex.name}
-            </button>
-          ))}
+          <input
+            type="text"
+            placeholder="Enter transaction ID (trxId)"
+            value={trxId}
+            onChange={(e) => setTrxId(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
-        <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg mb-4">
-          <p className="text-sm text-gray-500 mb-1">Address</p>
-          <p className="font-mono text-gray-700 dark:text-green-500 break-all">
-            {selectedExchange.address}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">Network</p>
-          <p className="font-semibold text-gray-700 dark:text-green-500">
-            {selectedExchange.network}
-          </p>
-        </div>
-
-        <input
-          type="text"
-          placeholder="Enter transaction ID (trxId)"
-          value={trxId}
-          onChange={(e) => setTrxId(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      {/* Submit */}
-      <button
-        onClick={handleDeposit}
-        className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-      >
-        Confirm Deposit
-      </button>
+        {/* Submit */}
+        <button
+          onClick={handleDeposit}
+          className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+        >
+          Confirm Deposit
+        </button>
       </div>
     </div>
   );

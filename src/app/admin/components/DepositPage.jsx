@@ -4,67 +4,73 @@ import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const DepositPage = () => {
+const AdminDepositPage = () => {
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("pending"); // pending | approved | rejected
+  const [activeTab, setActiveTab] = useState("pending");
+const DEPOSIT_URL = "https://treazoxbackend.vercel.app/api/deposit/";
 
-  const token = Cookies.get("token"); // kept as requested
+  const token = Cookies.get("token");
 
-  // Dummy deposits
-  const dummyDeposits = [
-    {
-      _id: "1",
-      user: { email: "john@example.com" },
-      exchange: { name: "Bitcoin", network: "BTC", address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" },
-      totalAmount: 250,
-      trxId: "TRX1234567890",
-      status: "pending",
-    },
-    {
-      _id: "2",
-      user: { email: "jane@example.com" },
-      exchange: { name: "Ethereum", network: "ETH", address: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88" },
-      totalAmount: 500,
-      trxId: "TRX0987654321",
-      status: "approved",
-    },
-    {
-      _id: "3",
-      user: { email: "alice@example.com" },
-      exchange: { name: "USDT", network: "TRC20", address: "TQ1tY5Y6k8sG1nYJ7YB6G1wM2T9Lk7G5Qf" },
-      totalAmount: 100,
-      trxId: "TRX1122334455",
-      status: "rejected",
-    },
-  ];
+  // ================= FETCH DEPOSITS =================
+  const fetchDeposits = async () => {
+    if (!token) return;
 
-  // Simulate fetching deposits
-  const fetchDeposits = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setDeposits(dummyDeposits);
+    try {
+      setLoading(true);
+      const res = await fetch(DEPOSIT_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch deposits");
+
+      setDeposits(data.deposits);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to load deposits");
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   useEffect(() => {
     fetchDeposits();
   }, []);
 
-  // Dummy status change handler
-  const handleStatusChange = (id, newStatus) => {
-    setDeposits((prev) =>
-      prev.map((d) => (d._id === id ? { ...d, status: newStatus } : d))
-    );
-    toast.success(`Deposit marked as ${newStatus} (dummy)`);
+  // ================= UPDATE STATUS =================
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const res = await fetch(`${DEPOSIT_URL}${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Update failed");
+
+      toast.success(`Deposit ${newStatus} successfully`);
+      fetchDeposits(); // refresh list
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to update deposit");
+    }
   };
 
-  const filteredDeposits = deposits.filter((d) => d.status === activeTab);
+  const filteredDeposits = deposits.filter(
+    (d) => d.status === activeTab
+  );
 
   return (
     <div className="sm:p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
       <Toaster position="top-right" />
+
       <h1 className="text-sm sm:text-3xl font-bold mb-4 text-gray-900 dark:text-white">
         Admin Deposit Management
       </h1>
@@ -90,58 +96,72 @@ const DepositPage = () => {
       <div className="overflow-x-auto rounded-lg shadow-lg bg-white dark:bg-gray-800">
         <table className="min-w-[max-content] w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">#</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">User Email</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Exchange(Network)</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Amount</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Exchange Address</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Trx ID</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Status</th>
-              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-200 uppercase">Action</th>
+            <tr className="text-primary dark:text-white">
+              <th className="px-4 py-2 text-left text-xs uppercase">User</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Email</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Exchange</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Amount</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Address</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Trx ID</th>
+              <th className="px-4 py-2 text-left text-xs uppercase">Status</th>
+              <th className="px-4 py-2 text-center text-xs uppercase">Action</th>
             </tr>
           </thead>
 
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={8} className="text-center py-4 text-gray-500 dark:text-gray-300">
+                <td colSpan={8} className="text-center py-4">
                   Loading deposits...
                 </td>
               </tr>
             ) : filteredDeposits.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-4 text-gray-500 dark:text-gray-300">
-                  No deposits in this tab
+                <td colSpan={8} className="text-center py-4">
+                  No deposits found
                 </td>
               </tr>
             ) : (
               filteredDeposits.map((item, index) => (
-                <tr key={item._id}>
-                  <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">{index + 1}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">{item.user.email}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200">{item.exchange.name} - {item.exchange.network}</td>
-                  <td className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-100">${item.totalAmount}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200 font-mono">{item.exchange.address}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-200 max-w-[200px] truncate">{item.trxId}</td>
-                  <td className="px-4 py-2 text-sm">
-                    <span className={`px-3 py-1 rounded-[5px] text-xs font-medium ${
-                      item.status === "approved" ? "bg-green-800 text-white" :
-                      item.status === "rejected" ? "bg-red-600 text-white" :
-                      "bg-yellow-400 text-black"
-                    }`}>
+                <tr key={item._id} className="text-primary dark:text-white">
+                  <td className="px-4 py-2">{item.user?.fullName}</td>
+                  <td className="px-4 py-2">{item.user?.email}</td>
+                  <td className="px-4 py-2">
+                    {item.exchange.name} ({item.exchange.network})
+                  </td>
+                  <td className="px-4 py-2 font-semibold">
+                    ${item.amount}
+                  </td>
+                  <td className="px-4 py-2 font-mono text-xs">
+                    {item.exchange.address}
+                  </td>
+                  <td className="px-4 py-2 text-xs truncate max-w-[200px]">
+                    {item.trxId}
+                  </td>
+                  <td className="px-4 py-2">
+                    <span
+                      className={`px-3 py-1 rounded text-xs font-medium ${
+                        item.status === "approved"
+                          ? "bg-green-700 text-white"
+                          : item.status === "rejected"
+                          ? "bg-red-600 text-white"
+                          : "bg-yellow-400 text-black"
+                      }`}
+                    >
                       {item.status}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-center">
                     <select
                       value={item.status}
-                      onChange={(e) => handleStatusChange(item._id, e.target.value)}
-                      className="px-3 py-1 border rounded-md bg-white dark:bg-gray-700 dark:text-white focus:outline-none"
+                      onChange={(e) =>
+                        handleStatusChange(item._id, e.target.value)
+                      }
+                      className="px-3 py-1 border rounded bg-white dark:bg-gray-700"
                     >
                       <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
+                      <option value="approved">Approve</option>
+                      <option value="rejected">Reject</option>
                     </select>
                   </td>
                 </tr>
@@ -154,4 +174,4 @@ const DepositPage = () => {
   );
 };
 
-export default DepositPage;
+export default AdminDepositPage;
