@@ -20,15 +20,14 @@ export default function SignUpPage() {
   const [acceptPolicy, setAcceptPolicy] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /* ================= GET REFERRAL FROM URL ================= */
+  // ✅ Get referral code from URL (?ref=XXXX)
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) {
-      setReferralCode(ref.toUpperCase());
+      setReferralCode(ref);
     }
   }, [searchParams]);
 
-  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,19 +52,20 @@ export default function SignUpPage() {
           email,
           phone,
           password,
-          referralCode: referralCode || undefined,
+          referralCode,
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
-        toast.success("Signup successful!");
+        toast.success(data.message || "Signup successful!");
         setTimeout(() => router.push("/login"), 1500);
       } else {
         toast.error(data.message || "Signup failed!");
       }
     } catch (err) {
+      console.error("Signup error:", err);
       toast.error("Something went wrong!");
     } finally {
       setLoading(false);
@@ -87,7 +87,7 @@ export default function SignUpPage() {
             placeholder="Full Name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            className="w-full px-4 py-3 rounded-lg"
             required
           />
 
@@ -96,7 +96,7 @@ export default function SignUpPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            className="w-full px-4 py-3 rounded-lg"
             required
           />
 
@@ -105,17 +105,17 @@ export default function SignUpPage() {
             placeholder="Phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            className="w-full px-4 py-3 rounded-lg"
             required
           />
 
-          {/* ===== Referral Code ===== */}
+          {/* ✅ Auto-filled referral code */}
           <input
             type="text"
             placeholder="Referral Code (optional)"
             value={referralCode}
-            onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            onChange={(e) => setReferralCode(e.target.value)}
+            className="w-full px-4 py-3 rounded-lg"
           />
 
           <input
@@ -123,7 +123,7 @@ export default function SignUpPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            className="w-full px-4 py-3 rounded-lg"
             required
           />
 
@@ -132,7 +132,7 @@ export default function SignUpPage() {
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 text-primary dark:text-white rounded-lg focus:ring-2 focus:ring-blue-700"
+            className="w-full px-4 py-3 rounded-lg"
             required
           />
 
@@ -141,27 +141,25 @@ export default function SignUpPage() {
               type="checkbox"
               checked={acceptPolicy}
               onChange={(e) => setAcceptPolicy(e.target.checked)}
-              className="w-4 h-4 accent-primary"
+              className="w-4 h-4"
             />
-            <label className="text-primary dark:text-white text-sm">
-              I accept the <Link href="/policy" className="underline">Terms & Policy</Link>
+            <label>
+              I accept the <Link href="/policy">Terms & Policy</Link>
             </label>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-primary text-white py-3 rounded-lg font-medium transition ${
-              loading ? "opacity-70 cursor-not-allowed" : "hover:bg-primary/80"
-            }`}
+            className="w-full bg-primary text-white py-3 rounded-lg"
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
 
-        <p className="text-center text-sm mt-4 text-primary dark:text-white">
+        <p className="text-center text-sm mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium underline">
+          <Link href="/login" className="font-medium">
             Login
           </Link>
         </p>
