@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Copy, Sun, Moon, Wallet } from "lucide-react";
+import { Copy, Sun, Moon } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 
@@ -12,34 +12,43 @@ const ProfilePage = () => {
   const [theme, setTheme] = useState("light");
   const [user, setUser] = useState(null);
   const [referralLink, setReferralLink] = useState("");
+  const [investments, setInvestments] = useState([]);
 
   useEffect(() => {
     setMounted(true);
 
-    // Read theme from cookies, fallback to light
     const savedTheme = Cookies.get("theme") || "light";
     setTheme(savedTheme);
 
-    // Fetch user from backend
     const token = Cookies.get("token");
     if (!token) return;
 
-    const fetchUser = async () => {
+    const fetchUserAndInvestments = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/users/me`, {
+        // Fetch user
+        const resUser = await fetch(`${BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        const dataUser = await resUser.json();
+        if (!resUser.ok) throw new Error(dataUser.message);
 
-        setUser(data.user);
-        setReferralLink(`${window.location.origin}/signup?ref=${data.user.referralCode}`);
+        setUser(dataUser.user);
+        setReferralLink(`${window.location.origin}/signup?ref=${dataUser.user.referralCode}`);
+
+        // Fetch investments
+        const resInv = await fetch(`${BASE_URL}/users/myinvestments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const dataInv = await resInv.json();
+        if (!resInv.ok) throw new Error(dataInv.message);
+
+        setInvestments(dataInv.investments || []);
       } catch (err) {
-        toast.error(err.message || "Failed to load user");
+        toast.error(err.message || "Failed to load data");
       }
     };
 
-    fetchUser();
+    fetchUserAndInvestments();
   }, []);
 
   useEffect(() => {
@@ -55,14 +64,6 @@ const ProfilePage = () => {
     if (!mounted) return;
     navigator.clipboard.writeText(referralLink);
     toast.success("Referral link copied!");
-  };
-
-  const handleLogout = () => {
-    if (!mounted) return;
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    toast.success("Logged out successfully!");
-    window.location.href = "/login";
   };
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
@@ -107,17 +108,39 @@ const ProfilePage = () => {
           </div>
           <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
             <p className="text-sm text-gray-500">Available Balance</p>
-            <p className="font-semibold text-green-500 text-lg">
-              ${user.balance || 0}
-            </p>
+            <p className="font-semibold text-green-500 text-lg">${user.balance || 0}</p>
           </div>
           <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
             <p className="text-sm text-gray-500">Commission Balance</p>
-            <p className="font-semibold text-green-500 text-lg">
-              ${user.commissionBalance || 0}
-            </p>
+            <p className="font-semibold text-green-500 text-lg">${user.commissionBalance || 0}</p>
           </div>
         </div>
+      </div>
+
+      {/* Investments List */}
+      <div className="max-w-[1170px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">My Active Investments</h2>
+        {investments.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-300">No active investments yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {investments.map((inv) => (
+              <div key={inv._id} className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
+                <p className="text-sm text-gray-500">Plan Price: ${inv.price}</p>
+                <p className="text-sm text-gray-500">Daily Earning: ${inv.dailyEarning}</p>
+                <p className="text-sm text-red-400">Remaining Days: {inv.duration}</p>
+                <p className="text-sm text-gray-500">Status: {inv.status}</p>
+                {inv.plan && (
+                  <p className="text-sm text-gray-500">
+                    Plan Duration: {inv.plan.duration} days
+                  </p>
+                )}
+                <p className="text-sm text-green-500">Total Earned: ${inv.dailyEarning * inv.duration}</p>
+
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Referral Card */}
@@ -141,15 +164,6 @@ const ProfilePage = () => {
             <Copy className="w-5 h-5" />
           </button>
         </div>
-      </div>
-
-      <div className="text-center md:hidden">
-        <button
-          onClick={handleLogout}
-          className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );
