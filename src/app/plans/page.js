@@ -70,15 +70,26 @@ export default function Plans() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plans.map((plan, index) => (
-              <div
-                key={plan._id}
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col justify-between hover:scale-105 transition-transform duration-300"
-              >
+             <div
+  key={plan._id}
+  className="bg-gray-50 dark:bg-gray-800 rounded-xl 
+             shadow-[0_10px_25px_rgba(0,0,0,0.08)]
+             dark:shadow-[0_10px_25px_rgba(0,0,0,0.4)]
+             ring-1 ring-gray-200 dark:ring-gray-700
+             p-6 flex flex-col justify-between
+             transition-all duration-300
+             hover:-translate-y-2
+             hover:shadow-[0_20px_40px_rgba(59,130,246,0.25)]
+             dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.35)]
+             hover:ring-primary/40"
+>
                 <h2 className="text-xl font-bold text-primary dark:text-white text-center mb-4">
                   Plan {index + 1}
                 </h2>
 
-                <div className="space-y-3">
+                <div className="space-y-4 bg-white/70 dark:bg-gray-900/60 
+                rounded-lg p-4
+                shadow-inner shadow-black/10 dark:shadow-black/40">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Price</p>
                     <p className="text-green-500 text-lg font-semibold">${plan.totalPrice}</p>

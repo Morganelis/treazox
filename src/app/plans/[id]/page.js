@@ -9,56 +9,45 @@ export default function PlanDetail() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Plan details from search params
   const planId = searchParams.get("id");
   const price = Number(searchParams.get("price"));
   const duration = Number(searchParams.get("duration"));
   const dailyIncome = Number(searchParams.get("dailyIncome"));
 
   const [loading, setLoading] = useState(false);
-  const [exchange, setExchange] = useState("binance");
-  const [trxId, setTrxId] = useState("");
 
-  const EXCHANGE_DETAILS = {
-    binance: { name: "Binance", address: "bnb1qexampleaddresshere", network: "BEP-20" },
-    okx: { name: "OKX", address: "0xokxexampleaddress", network: "ERC-20" },
-    bitget: { name: "Bitget", address: "0xbitgetexampleaddress", network: "TRC-20" },
-  };
-
-  const currentExchange = EXCHANGE_DETAILS[exchange];
-  const isFormValid = trxId.trim() && planId && price && duration && dailyIncome;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isFormValid) {
-      toast.error("Please complete all fields");
+  const handleSubmit = async () => {
+    if (!planId) {
+      toast.error("Invalid plan");
       return;
     }
 
     setLoading(true);
-
-    const token = Cookies.get("token"); // get user token
+    const token = Cookies.get("token");
 
     try {
-      const res = await fetch("https://treazoxbackend.vercel.app/api/investment/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          planId,
-          trxId,
-          exchange,
-        }),
-      });
+      const res = await fetch(
+        "https://treazoxbackend.vercel.app/api/investment/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            planId,
+            exchange: "wallet",
+          }),
+        }
+      );
 
       const data = await res.json();
+
       if (res.ok) {
-        toast.success("Investment submitted successfully!");
+        toast.success("Investment created successfully");
         router.push("/dashboard");
       } else {
-        toast.error(data.message || "Failed to submit investment");
+        toast.error(data.message || "Investment failed");
       }
     } catch (err) {
       console.error(err);
@@ -69,83 +58,62 @@ export default function PlanDetail() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
       <Toaster position="top-right" />
 
-      <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 sm:p-6 space-y-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-900 dark:text-white">
-          Plan Details
+      <div
+        className="w-full max-w-lg rounded-2xl
+        bg-white dark:bg-gray-800
+        p-6 space-y-6
+        ring-1 ring-gray-200 dark:ring-gray-700
+        shadow-[0_20px_40px_rgba(0,0,0,0.12)]
+        dark:shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+      >
+        <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+          Confirm Investment
         </h1>
 
         {/* Plan Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Price</p>
-            <p className="font-semibold text-green-600">${price}</p>
-          </div>
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Duration</p>
-            <p className="font-semibold text-green-600">{duration} Days</p>
-          </div>
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3">
-            <p className="text-xs text-gray-500">Daily Earning</p>
-            <p className="font-semibold text-green-600">${dailyIncome}</p>
-          </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          {[
+            { label: "Price", value: `$${price}` },
+            { label: "Duration", value: `${duration} Days` },
+            { label: "Daily Income", value: `$${dailyIncome}` },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="bg-gray-100 dark:bg-gray-900 rounded-xl p-4
+              shadow-inner ring-1 ring-gray-200 dark:ring-gray-700"
+            >
+              <p className="text-xs text-gray-500">{item.label}</p>
+              <p className="font-semibold text-green-600">{item.value}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Exchange Select */}
-        <div>
-          <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">
-            Deposit Exchange
-          </label>
-          <select
-            value={exchange}
-            onChange={(e) => setExchange(e.target.value)}
-            className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-900 text-primary dark:text-white focus:outline-none"
-          >
-            <option value="binance">Binance</option>
-            <option value="okx">OKX</option>
-            <option value="bitget">Bitget</option>
-          </select>
+        {/* Wallet Info */}
+        <div
+          className="bg-green-50 dark:bg-green-900/20
+          border border-green-300 dark:border-green-700
+          rounded-xl p-4 text-sm text-green-700 dark:text-green-400"
+        >
+          💳 This investment amount will be deducted from your wallet balance.
         </div>
 
-        {/* Exchange Details */}
-        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 text-sm space-y-2">
-          <p>
-            <span className="font-semibold">Network:</span>{" "}
-            <span className="text-green-500">{currentExchange.network}</span>
-          </p>
-          <p className="break-all">
-            <span className="font-semibold">Address:</span>{" "}
-            <span className="text-green-500 font-mono">{currentExchange.address}</span>
-          </p>
-        </div>
-
-        {/* Transaction ID */}
-        <div>
-          <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">
-            Transaction ID
-          </label>
-          <input
-            type="text"
-            value={trxId}
-            onChange={(e) => setTrxId(e.target.value)}
-            placeholder="Enter transaction hash"
-            className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-900 text-primary dark:text-white focus:outline-none"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <form onSubmit={handleSubmit}>
-          <button
-            type="submit"
-            disabled={!isFormValid || loading}
-            className={`w-full py-3 rounded-lg text-white transition
-              ${!isFormValid || loading ? "bg-primary cursor-not-allowed" : "bg-primary hover:bg-primary/80"}`}
-          >
-            {loading ? "Submitting..." : "Confirm Investment"}
-          </button>
-        </form>
+        {/* Submit */}
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className={`w-full py-3 rounded-xl text-white font-semibold
+            transition-all duration-300
+            ${
+              loading
+                ? "bg-primary/60 cursor-not-allowed"
+                : "bg-primary shadow-lg shadow-primary/40 hover:shadow-xl hover:-translate-y-0.5"
+            }`}
+        >
+          {loading ? "Processing..." : "Confirm Investment"}
+        </button>
       </div>
     </div>
   );

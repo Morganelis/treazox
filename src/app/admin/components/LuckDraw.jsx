@@ -4,18 +4,17 @@ import React, { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const LuckDraw = () => {
+const LuckyDrawAdmin = () => {
   const [luckyDraws, setLuckyDraws] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState({
     buyPrice: "",
     winningPrice: "",
-    participants: "",
-    winner: "",
+    participantsLimit: "",
+    endDate: "",
   });
-  const LUCKYDRAW_URL = "https://treazoxbackend.vercel.app/api/luckydraw/";
 
+  const LUCKYDRAW_URL = "https://treazoxbackend.vercel.app/api/luckydraw/";
   const token = Cookies.get("token");
 
   /* ================= FETCH ALL LUCKY DRAWS ================= */
@@ -26,7 +25,6 @@ const LuckDraw = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
@@ -45,12 +43,11 @@ const LuckDraw = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  /* ================= CREATE / UPDATE ================= */
+  /* ================= CREATE ================= */
   const handleSubmit = async () => {
-    const { buyPrice, winningPrice, participants, winner } = formData;
-
-    if (!buyPrice || !winningPrice || !participants) {
-      toast.error("All required fields must be filled");
+    const { buyPrice, winningPrice, participantsLimit, endDate } = formData;
+    if (!buyPrice || !winningPrice || !participantsLimit || !endDate) {
+      toast.error("All fields are required");
       return;
     }
 
@@ -58,9 +55,8 @@ const LuckDraw = () => {
       const body = {
         buyPrice,
         winningPrice,
-        participantsLimit: participants,
-        winnersCount: winner || 1,
-        endDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // default 24h
+        participantsLimit,
+        endDate,
       };
 
       const res = await fetch(LUCKYDRAW_URL, {
@@ -75,8 +71,9 @@ const LuckDraw = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      toast.success("Lucky Draw created");
-      resetForm();
+      toast.success("Lucky Draw created successfully!");
+      setShowModal(false);
+      setFormData({ buyPrice: "", winningPrice: "", participantsLimit: "", endDate: "" });
       fetchLuckyDraws();
     } catch (err) {
       toast.error(err.message || "Failed to create lucky draw");
@@ -86,30 +83,18 @@ const LuckDraw = () => {
   /* ================= DELETE ================= */
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this lucky draw?")) return;
-
     try {
       const res = await fetch(`${LUCKYDRAW_URL}${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-
       toast.success("Lucky Draw deleted");
       fetchLuckyDraws();
     } catch (err) {
       toast.error(err.message || "Delete failed");
     }
-  };
-
-  /* ================= RESET ================= */
-  const resetForm = () => {
-    setFormData({ buyPrice: "", winningPrice: "", participants: "", winner: "" });
-    setEditIndex(null);
-    setShowModal(false);
   };
 
   return (
@@ -119,7 +104,7 @@ const LuckDraw = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          Lucky Draws
+          Lucky Draw Admin
         </h1>
         <button
           onClick={() => setShowModal(true)}
@@ -137,7 +122,7 @@ const LuckDraw = () => {
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Buy Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winning Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase">Participants</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winners</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase">Winner</th>
               <th className="px-6 py-3 text-center text-xs font-medium uppercase">Actions</th>
             </tr>
           </thead>
@@ -149,24 +134,31 @@ const LuckDraw = () => {
                 </td>
               </tr>
             ) : (
-              luckyDraws.map((item) => (
-                <tr key={item._id} className="dark:text-white">
-                  <td className="px-6 py-4">{item.buyPrice}</td>
-                  <td className="px-6 py-4">{item.winningPrice}</td>
-                  <td className="px-6 py-4">
-                    {item.participants.length}/{item.participantsLimit}
-                  </td>
-                  <td className="px-6 py-4">{item.winnersCount}</td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+              luckyDraws.map((item) => {
+                const winner = item.winners?.[0];
+                return (
+                  <tr key={item._id} className="dark:text-white">
+                    <td className="px-6 py-4">${item.buyPrice}</td>
+                    <td className="px-6 py-4">${item.winningPrice}</td>
+                    <td className="px-6 py-4">
+                      {item.participants.length}/{item.participantsLimit}
+                    </td>
+                    <td className="px-6 py-4">
+                      {winner?.userId?.fullName
+                        ? `${winner.userId.fullName} ($${winner.wonAmount})`
+                        : "-"}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -181,17 +173,51 @@ const LuckDraw = () => {
             </h2>
 
             <div className="space-y-3">
-              <input type="number" name="buyPrice" placeholder="Buy Price" className="w-full px-3 py-2 border rounded" value={formData.buyPrice} onChange={handleChange} />
-              <input type="number" name="winningPrice" placeholder="Winning Price" className="w-full px-3 py-2 border rounded" value={formData.winningPrice} onChange={handleChange} />
-              <input type="number" name="participants" placeholder="Participants Limit" className="w-full px-3 py-2 border rounded" value={formData.participants} onChange={handleChange} />
-              <input type="number" name="winner" placeholder="Number of Winners" className="w-full px-3 py-2 border rounded" value={formData.winner} onChange={handleChange} />
+              <input
+                type="number"
+                name="buyPrice"
+                placeholder="Buy Price"
+                className="w-full px-3 py-2 border rounded"
+                value={formData.buyPrice}
+                onChange={handleChange}
+              />
+              <input
+                type="number"
+                name="winningPrice"
+                placeholder="Winning Price"
+                className="w-full px-3 py-2 border rounded"
+                value={formData.winningPrice}
+                onChange={handleChange}
+              />
+              <input
+                type="number"
+                name="participantsLimit"
+                placeholder="Participants Limit"
+                className="w-full px-3 py-2 border rounded"
+                value={formData.participantsLimit}
+                onChange={handleChange}
+              />
+              <input
+                type="datetime-local"
+                name="endDate"
+                placeholder="End Date & Time"
+                className="w-full px-3 py-2 border rounded"
+                value={formData.endDate}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="flex justify-end gap-3 mt-5">
-              <button onClick={resetForm} className="px-4 py-2 bg-gray-400 text-white rounded">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded"
+              >
                 Cancel
               </button>
-              <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
                 Create
               </button>
             </div>
@@ -202,4 +228,4 @@ const LuckDraw = () => {
   );
 };
 
-export default LuckDraw;
+export default LuckyDrawAdmin;

@@ -68,7 +68,20 @@ const ProfilePage = () => {
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-  if (!mounted || !user) return null;
+  if (!mounted || !user) {
+  return (
+    <div className="min-h-screen bg-primary flex items-center justify-center">
+      <p className="text-white text-lg font-semibold">Loading...</p>
+    </div>
+  );
+}
+
+  const handleLogout = () => {
+  Cookies.remove("token");   // remove auth token
+  Cookies.remove("role");    // optional (if stored)
+
+  window.location.href = "/login"; // redirect to login
+};
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors duration-300">
@@ -156,7 +169,7 @@ const ProfilePage = () => {
             value={referralLink}
             className="flex-1 p-3 rounded-lg text-green-500 bg-gray-100 dark:bg-gray-900 text-sm"
           />
-          <button
+          <button 
             onClick={copyReferralLink}
             className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             title="Copy referral link"
@@ -164,7 +177,18 @@ const ProfilePage = () => {
             <Copy className="w-5 h-5" />
           </button>
         </div>
+
+        
       </div>
+
+      <div className="my-6 text-center block md:hidden">
+  <button
+    onClick={handleLogout}
+    className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+  >
+    Logout
+  </button>
+</div>
     </div>
   );
 };

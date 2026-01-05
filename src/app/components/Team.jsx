@@ -54,7 +54,7 @@ const Team = () => {
   );
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="bg-gray-100 dark:bg-primary min-h-screen">
       <Toaster position="top-right" />
       <div className="max-w-[1170px] mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-primary dark:text-white text-center">
