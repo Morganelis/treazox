@@ -262,26 +262,37 @@ const HistoryTable = ({ title, data, activeTab }) => (
         </tr>
       </thead>
       <tbody>
-        {data.map((item, i) => {
-          const status = item.status?.toLowerCase();
+        {data.length === 0 ? (
+          <tr>
+            <td colSpan={3} className="text-center py-4 text-gray-500">
+              No records found
+            </td>
+          </tr>
+        ) : (
+          data.map((item, i) => {
+            const status = item.status?.toLowerCase();
 
-          return (
-            <tr key={i}>
-              <td className="py-3 text-primary dark:text-white">
-                {activeTab === "account"
-                  ? item.type
-                  : activeTab === "withdraw"
-                  ? "Withdraw"
-                  : "Lucky Draw"}
-              </td>
+            // Use wonAmount for lucky draw tab
+            const amount =
+              activeTab === "lucky" ? item.wonAmount : item.amount;
 
-              <td className="text-primary dark:text-white">
-                ${item.amount}
-              </td>
+            return (
+              <tr key={i}>
+                <td className="py-3 text-primary dark:text-white">
+                  {activeTab === "account"
+                    ? item.type
+                    : activeTab === "withdraw"
+                    ? "Withdraw"
+                    : "Lucky Draw"}
+                </td>
 
-              <td>
-                <span
-                  className={`text-xs font-semibold
+                <td className="text-primary dark:text-white">
+                  ${amount || 0}
+                </td>
+
+                <td>
+                  <span
+                    className={`text-xs font-semibold
                     ${
                       ["completed", "success", "approved"].includes(status)
                         ? "text-green-500"
@@ -289,17 +300,19 @@ const HistoryTable = ({ title, data, activeTab }) => (
                         ? "text-orange-500"
                         : "text-red-500"
                     }`}
-                >
-                  {item.status}
-                </span>
-              </td>
-            </tr>
-          );
-        })}
+                  >
+                    {activeTab === "lucky" ? "Won" : item.status || "-"}
+                  </span>
+                </td>
+              </tr>
+            );
+          })
+        )}
       </tbody>
     </table>
   </div>
 );
+
 
 /* ================= REFERRAL TABLE ================= */
 // const ReferralTable = ({ data }) => (
