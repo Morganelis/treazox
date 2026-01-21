@@ -63,7 +63,8 @@ export default function PlanDetail() {
 
       <div
         className="w-full max-w-lg rounded-2xl
-        bg-white dark:bg-gray-800
+        bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800
         p-6 space-y-6
         ring-1 ring-gray-200 dark:ring-gray-700
         shadow-[0_20px_40px_rgba(0,0,0,0.12)]
