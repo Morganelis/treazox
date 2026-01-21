@@ -72,16 +72,8 @@ export default function Plans() {
             {plans.map((plan, index) => (
              <div
   key={plan._id}
-  className="bg-gray-50 dark:bg-gray-800 rounded-xl 
-             shadow-[0_10px_25px_rgba(0,0,0,0.08)]
-             dark:shadow-[0_10px_25px_rgba(0,0,0,0.4)]
-             ring-1 ring-gray-200 dark:ring-gray-700
-             p-6 flex flex-col justify-between
-             transition-all duration-300
-             hover:-translate-y-2
-             hover:shadow-[0_20px_40px_rgba(59,130,246,0.25)]
-             dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.35)]
-             hover:ring-primary/40"
+  className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out"
 >
                 <h2 className="text-xl font-bold text-primary dark:text-white text-center mb-4">
                   Plan {index + 1}

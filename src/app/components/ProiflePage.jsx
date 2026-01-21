@@ -119,7 +119,8 @@ const ProfilePage = () => {
       </div>
 
       {/* Assets Card */}
-      <div className="max-w-[1170px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <div className="max-w-[1170px] mx-auto bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Assets</h2>
         <div className="grid grid-cols-1 gap-4">
           <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
@@ -140,7 +141,8 @@ const ProfilePage = () => {
       </div>
 
       {/* Investments List */}
-      <div className="max-w-[1170px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <div className="max-w-[1170px] mx-auto bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">My Active Investments</h2>
         {investments.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-300">No active investments yet.</p>
@@ -166,7 +168,8 @@ const ProfilePage = () => {
       </div>
 
       {/* Referral Card */}
-      <div className="max-w-[1170px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+      <div className="max-w-[1170px] mx-auto bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Referral Program</h2>
         <p className="text-gray-500 dark:text-gray-300 mb-1">Your Referral Code</p>
         <p className="font-mono text-green-500 font-semibold mb-4">{user.referralCode}</p>
