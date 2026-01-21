@@ -172,7 +172,7 @@ const ProfilePage = () => {
       transition-all duration-700 ease-out dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Referral Program</h2>
         <p className="text-gray-500 dark:text-gray-300 mb-1">Your Referral Code</p>
-        <p className="font-mono text-green-500 font-semibold mb-4">{user.referralCode}</p>
+        <p className="font-mono text-primary font-semibold mb-4">{user.referralCode}</p>
 
         <p className="text-gray-500 dark:text-gray-300 mb-1">Your Referral Link</p>
         <div className="flex gap-2 items-center">

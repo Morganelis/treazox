@@ -72,8 +72,11 @@ export default function Plans() {
             {plans.map((plan, index) => (
              <div
   key={plan._id}
-  className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
-      transition-all duration-700 ease-out"
+  className=" rounded-xl 
+             bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out
+             p-6 flex flex-col justify-between
+             "
 >
                 <h2 className="text-xl font-bold text-primary dark:text-white text-center mb-4">
                   Plan {index + 1}
