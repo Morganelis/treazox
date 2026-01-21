@@ -300,13 +300,18 @@ const Dashboard = () => {
 
 /* ================= TABLE ================= */
 const HistoryTable = ({ title, data, activeTab }) => (
-  <div className="p-4 sm:p-6">
+  <div className="p-4 sm:p-6 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out
+      ">
     <h2 className="text-lg font-semibold mb-4 text-primary dark:text-white">
       {title}
     </h2>
 
     <table className="w-full text-sm border border-gray-200 dark:border-gray-700 border-collapse">
-      <thead className="bg-gray-100 dark:bg-gray-900 ">
+      <thead className=" bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+     
+      transition-all duration-700 ease-out
+     dark:bg-gray-900 ">
         <tr className="text-primary dark:text-white">
           <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 text-left">
             Type
@@ -325,7 +330,7 @@ const HistoryTable = ({ title, data, activeTab }) => (
           <tr>
             <td
               colSpan={3}
-              className="border border-gray-200 dark:border-gray-700 px-3 py-4 text-center text-gray-500"
+              className="border border-gray-200  dark:border-gray-700 px-3 py-4 text-center text-primary"
             >
               No records found
             </td>
