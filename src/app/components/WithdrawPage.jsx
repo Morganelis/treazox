@@ -11,7 +11,7 @@ const EXCHANGES = [
   { name: "Bitget", networks: ["ERC20", "TRC20", "BEP20"] },
 ];
 
-const API_URL = "https://treazoxbackend.vercel.app/api/withdraw/";
+const API_URL = "https://treazoxbe.vercel.app/api/withdraw/";
 
 const WithdrawPage = () => {
   const [balance, setBalance] = useState(0);
@@ -26,7 +26,7 @@ const WithdrawPage = () => {
   // Fetch user balance
   const fetchBalance = async () => {
     try {
-      const res = await fetch("https://treazoxbackend.vercel.app/api/users/me", {
+      const res = await fetch("https://treazoxbe.vercel.app/api/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

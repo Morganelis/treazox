@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const LUCKYDRAW_URL = "https://treazoxbackend.vercel.app/api/luckydraw/";
+const LUCKYDRAW_URL = "https://treazoxbe.vercel.app/api/luckydraw/";
 
 const LuckyDraw = () => {
   const [draws, setDraws] = useState([]);

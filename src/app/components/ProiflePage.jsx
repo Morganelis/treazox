@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import avatar from "../../../public/avatar.png"
 import Image from "next/image";
 
-const BASE_URL = "https://treazoxbackend.vercel.app/api";
+const BASE_URL = "https://treazoxbe.vercel.app/api";
 
 const ProfilePage = () => {
   const [mounted, setMounted] = useState(false);

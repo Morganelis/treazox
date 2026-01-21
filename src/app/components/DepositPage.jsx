@@ -21,8 +21,8 @@ const DepositPage = () => {
   const [selectedExchange, setSelectedExchange] = useState(EXCHANGES[0]);
   const [trxId, setTrxId] = useState("");
   const [token, setToken] = useState("");
-const BALANCE_URL = "https://treazoxbackend.vercel.app/api/users/me";
-const DEPOSIT_URL = "https://treazoxbackend.vercel.app/api/deposit/";
+const BALANCE_URL = "https://treazoxbe.vercel.app/api/users/me";
+const DEPOSIT_URL = "https://treazoxbe.vercel.app/api/deposit/";
 
 
 
