@@ -8,7 +8,7 @@ const AdminDepositPage = () => {
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
-const DEPOSIT_URL = "https://treazoxbackend.vercel.app/api/deposit/";
+const DEPOSIT_URL = "https://treazoxbe.vercel.app/api/deposit/";
 
   const token = Cookies.get("token");
 

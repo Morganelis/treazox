@@ -13,7 +13,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   // Backend URL
-  const BACKEND_URL = "https://treazoxbackend.vercel.app/api/users/login";
+  const BACKEND_URL = "https://treazoxbe.vercel.app/api/users/login";
 
   const isProd = process.env.NODE_ENV === "production";
 

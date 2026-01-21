@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const API_URL = "https://treazoxbackend.vercel.app/api/withdraw/";
+const API_URL = "https://treazoxbe.vercel.app/api/withdraw/";
 
 const WithdrawAdminPage = () => {
   const [withdraws, setWithdraws] = useState([]);

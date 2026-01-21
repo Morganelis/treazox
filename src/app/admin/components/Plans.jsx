@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans/";
+const BACKEND_URL = "https://treazoxbe.vercel.app/api/plans/";
 
 const Plans = () => {
   const [plans, setPlans] = useState([]);

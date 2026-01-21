@@ -11,7 +11,7 @@ export default function SignUpClient() {
  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const BACKEND_URL = "https://treazoxbackend.vercel.app/api/users/signup";
+  const BACKEND_URL = "https://treazoxbe.vercel.app/api/users/signup";
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");

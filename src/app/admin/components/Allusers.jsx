@@ -20,7 +20,7 @@ const Allusers = () => {
     role: "user",
     active: true,
   });
-  const USER_URL = "https://treazoxbackend.vercel.app/api/users/";
+  const USER_URL = "https://treazoxbe.vercel.app/api/users/";
 
   const token = Cookies.get("token");
 

@@ -5,7 +5,7 @@ import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 
 const ITEMS_PER_PAGE = 10;
-const API_URL = "https://treazoxbackend.vercel.app/api/investment/";
+const API_URL = "https://treazoxbe.vercel.app/api/investment/";
 
 const Investments = () => {
   const [pending, setPending] = useState([]);

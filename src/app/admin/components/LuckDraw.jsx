@@ -14,7 +14,7 @@ const LuckyDrawAdmin = () => {
     endDate: "",
   });
 
-  const LUCKYDRAW_URL = "https://treazoxbackend.vercel.app/api/luckydraw/";
+  const LUCKYDRAW_URL = "https://treazoxbe.vercel.app/api/luckydraw/";
   const token = Cookies.get("token");
 
   /* ================= FETCH ALL LUCKY DRAWS ================= */
