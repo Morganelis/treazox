@@ -33,34 +33,44 @@ const Dashboard = () => {
       ? `${window.location.origin}/signup?ref=${referralCode}`
       : "";
 
+      const handleLogout = () => {
+  Cookies.remove("token");
+  router.replace("/login");
+};
   /* ================= FETCH USER ================= */
-  useEffect(() => {
-    if (!token) return;
+    useEffect(() => {
+      if (!token) return;
 
-    const fetchMe = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const fetchMe = async () => {
+        try {
+          const res = await fetch(`${BASE_URL}/users/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+          if (res.status === 401) {
+      toast.error("Session expired. Please login again.");
+      handleLogout();
+      return;
+    }
 
-        setDashboard({
-          totalAssets: data.user.totalAssets || 0,
-          availableBalance: data.user.balance || 0,
-          dailyIncome: data.user.dailyIncome || 0,
-        });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message);
 
-        setCommissionBalance(data.user.commissionBalance || 0);
-        setReferralCode(data.user.referralCode || "");
-      } catch (err) {
-        toast.error(err.message || "Failed to load user");
-      }
-    };
+          setDashboard({
+            totalAssets: data.user.totalAssets || 0,
+            availableBalance: data.user.balance || 0,
+            dailyIncome: data.user.dailyIncome || 0,
+          });
 
-    fetchMe();
-  }, [token]);
+          setCommissionBalance(data.user.commissionBalance || 0);
+          setReferralCode(data.user.referralCode || "");
+        } catch (err) {
+          toast.error(err.message || "Failed to load user");
+        }
+      };
+
+      fetchMe();
+    }, [token]);
 
   /* ================= FETCH REFERRALS ================= */
   // useEffect(() => {
@@ -122,7 +132,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen pb-6">
       <Toaster position="top-right" />
 
       <div className="max-w-[1170px] mx-auto p-4 sm:p-6">
@@ -131,38 +141,60 @@ const Dashboard = () => {
         </h1>
 
         {/* ================= ASSETS ================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
           <p className="text-gray-500">Total Assets</p>
-          <h2 className="text-3xl font-bold text-green-600 mb-6">
-            ${dashboard.availableBalance}
-          </h2>
+         <h2 className="text-3xl font-bold text-green-600 mb-6">
+  ${Number(dashboard.availableBalance).toFixed(2)}
+</h2>
+         <div className="grid grid-cols-2 gap-4 mb-6">
+  {/* Available Balance */}
+  <div
+    className="
+      p-5 rounded-lg
+      bg-gradient-to-br from-green-50 to-green-100
+      dark:from-green-900/30 dark:to-green-800/30
+      shadow-sm
+      transition
+    "
+  >
+    <p className="text-sm text-gray-600 dark:text-gray-400">
+      Available Balance
+    </p>
+    <p className="text-xl font-semibold text-green-600">
+      ${Number(dashboard.availableBalance).toFixed(2)}
+    </p>
+  </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-              <p className="text-sm text-gray-500">Available Balance</p>
-              <p className="font-semibold text-green-500">
-                ${dashboard.availableBalance}
-              </p>
-            </div>
+  {/* Team Income */}
+  <div
+    className="
+      p-5 rounded-lg
+      bg-gradient-to-br from-blue-50 to-blue-100
+      dark:from-blue-900/30 dark:to-blue-800/30
+      shadow-sm
+      transition
+    "
+  >
+    <p className="text-sm text-gray-600 dark:text-gray-400">
+      Team Income
+    </p>
+    <p className="text-xl font-semibold text-blue-600">
+      ${commissionBalance}
+    </p>
+  </div>
+</div>
 
-            <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-              <p className="text-sm text-gray-500">Team Income</p>
-              <p className="font-semibold text-green-500">
-                ${commissionBalance}
-              </p>
-            </div>
-          </div>
 
           <div className="flex gap-3">
             <button
               onClick={() => router.push("/deposit")}
-              className="w-full py-3 bg-green-600 text-white rounded-lg"
+              className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-600/60 hover:-translate-y-3  duration-1000"
             >
               Deposit
             </button>
             <button
               onClick={() => router.push("/withdraw")}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg"
+              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-600/60 hover:-translate-y-3  duration-1000"
             >
               Withdraw
             </button>
@@ -170,32 +202,32 @@ const Dashboard = () => {
         </div>
 
         {/* ================= TABS ================= */}
-       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-  {[
-    { id: "account", label: "Account History", icon: FileText },
-    { id: "withdraw", label: "Withdraw History", icon: Wallet },
-    { id: "lucky", label: "Treasure Gift Cards", icon: Gift },
-    // { id: "referral", label: "Referral History", icon: Copy },
-  ].map(({ id, label, icon: Icon }) => (
-    <button
-      key={id}
-      onClick={() => setActiveTab(id)}
-      className={`p-4 rounded-lg shadow flex flex-col items-center gap-1 transition-colors duration-200 
-        ${
-          activeTab === id
-            ? "border border-green-300 text-green-500 bg-white dark:bg-gray-800"
-            : "bg-white dark:bg-gray-800 text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-        }
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          {[
+            { id: "account", label: "Account History", icon: FileText },
+            { id: "withdraw", label: "Withdraw History", icon: Wallet },
+            { id: "lucky", label: "Treasure Gift Cards", icon: Gift },
+            // { id: "referral", label: "Referral History", icon: Copy },
+          ].map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`p-4 rounded-lg shadow flex flex-col items-center gap-1 transition-colors duration-200 
+        ${activeTab === id
+                  ? "border border-green-300 text-green-500 bg-white dark:bg-gray-800"
+                  : "bg-white dark:bg-gray-800 text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                }
       `}
-    >
-      <Icon className="w-5 h-5 text-blue-600" />
-      <span className="text-sm text-center">{label}</span>
-    </button>
-  ))}
-</div>
+            >
+              <Icon className="w-5 h-5 text-blue-600" />
+              <span className="text-sm text-center">{label}</span>
+            </button>
+          ))}
+        </div>
 
         {/* ================= TABLE ================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto">
+
           {activeTab === "account" && (
             <HistoryTable
               title="Account History"
@@ -253,32 +285,43 @@ const HistoryTable = ({ title, data, activeTab }) => (
       {title}
     </h2>
 
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b text-primary dark:text-white">
-          <th className="text-left py-2">Type</th>
-          <th className="text-left">Amount</th>
-          <th className="text-left">Status</th>
+    <table className="w-full text-sm border border-gray-200 dark:border-gray-700 border-collapse">
+      <thead className="bg-gray-100 dark:bg-gray-900 ">
+        <tr className="text-primary dark:text-white">
+          <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 text-left">
+            Type
+          </th>
+          <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 text-left">
+            Amount
+          </th>
+          <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 text-left">
+            Status
+          </th>
         </tr>
       </thead>
+
       <tbody>
         {data.length === 0 ? (
           <tr>
-            <td colSpan={3} className="text-center py-4 text-gray-500">
+            <td
+              colSpan={3}
+              className="border border-gray-200 dark:border-gray-700 px-3 py-4 text-center text-gray-500"
+            >
               No records found
             </td>
           </tr>
         ) : (
           data.map((item, i) => {
             const status = item.status?.toLowerCase();
-
-            // Use wonAmount for lucky draw tab
             const amount =
               activeTab === "lucky" ? item.wonAmount : item.amount;
 
             return (
-              <tr key={i}>
-                <td className="py-3 text-primary dark:text-white">
+              <tr
+                key={i}
+                className="hover:bg-gray-50 dark:hover:bg-gray-700 transition text-primary dark:text-white"
+              >
+                <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
                   {activeTab === "account"
                     ? item.type
                     : activeTab === "withdraw"
@@ -286,20 +329,20 @@ const HistoryTable = ({ title, data, activeTab }) => (
                     : "Lucky Draw"}
                 </td>
 
-                <td className="text-primary dark:text-white">
-                  ${amount || 0}
+                <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
+                  ${Number(amount || 0).toFixed(2)}
                 </td>
 
-                <td>
+                <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
                   <span
                     className={`text-xs font-semibold
-                    ${
-                      ["completed", "success", "approved"].includes(status)
-                        ? "text-green-500"
-                        : ["pending", "processing"].includes(status)
-                        ? "text-orange-500"
-                        : "text-red-500"
-                    }`}
+                      ${
+                        ["completed", "success","credited" ,"approved","won"].includes(status)
+                          ? "text-green-600"
+                          : ["pending", "processing"].includes(status)
+                          ? "text-orange-500"
+                          : "text-red-500"
+                      }`}
                   >
                     {activeTab === "lucky" ? "Won" : item.status || "-"}
                   </span>
@@ -312,6 +355,7 @@ const HistoryTable = ({ title, data, activeTab }) => (
     </table>
   </div>
 );
+
 
 
 /* ================= REFERRAL TABLE ================= */

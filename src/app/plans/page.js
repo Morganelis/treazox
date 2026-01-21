@@ -87,9 +87,9 @@ export default function Plans() {
                   Plan {index + 1}
                 </h2>
 
-                <div className="space-y-4 bg-white/70 dark:bg-gray-900/60 
+                <div className="space-y-4 bg-white/70 dark:bg-gray-900/90 
                 rounded-lg p-4
-                shadow-inner shadow-black/10 dark:shadow-black/40">
+                shadow-inner shadow-black/30 dark:shadow-black/70">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Price</p>
                     <p className="text-green-500 text-lg font-semibold">${plan.totalPrice}</p>

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Copy, Sun, Moon } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
+import avatar from "../../../public/avatar.png"
+import Image from "next/image";
 
 const BASE_URL = "https://treazoxbackend.vercel.app/api";
 
@@ -100,12 +102,19 @@ const ProfilePage = () => {
 
       {/* Profile Header */}
       <div className="max-w-[1170px] mx-auto flex items-center gap-6 mb-6">
-        <div className="w-20 h-20 rounded-full bg-primary dark:bg-gray-700 flex items-center justify-center text-2xl font-bold text-white">
-          {user.fullName[0]}
-        </div>
+       <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary dark:border-gray-600">
+  <Image
+    src={avatar}
+    alt="User Avatar"
+    width={80}
+    height={80}
+    className="object-cover w-full h-full"
+    priority
+  />
+</div>
         <div>
           <h1 className="text-2xl font-bold text-primary dark:text-white">{user.fullName}</h1>
-          <p className="text-gray-500 dark:text-gray-300">User ID: {user._id}</p>
+          {/* <p className="text-gray-500 dark:text-gray-300">User ID: {user._id}</p> */}
         </div>
       </div>
 

@@ -47,6 +47,12 @@ export default function LoginPage() {
           sameSite: "strict",
           path: "/",
         });
+         Cookies.set("userId", data.user._id, {
+          expires: 30,
+          secure: isProd,
+          sameSite: "strict",
+          path: "/",
+        });
 
         // Redirect based on role
         if (data.user.role === "admin") router.push("/admin");
@@ -63,7 +69,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full h-[90vh] flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="w-full h-[93vh] flex justify-center items-center bg-gray-100 dark:bg-gray-900 p-4">
       <Toaster position="top-right" />
       <div className="max-w-md w-full bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-2xl">
         <h1 className="text-2xl font-bold mb-6 text-center text-primary dark:text-white">

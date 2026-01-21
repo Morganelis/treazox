@@ -96,13 +96,20 @@ const LuckyDraw = () => {
             const ended = new Date() > new Date(draw.endDate);
             const full = draw.participants.length >= draw.participantsLimit;
 
-            const joined = draw.participants.some(
-              (p) => p.userId?.toString() === userId
-            );
-
+            // FIXED: correct joined check (supports both ObjectId and populated object)
+          const joined = draw.participants.some((p) => {
+              const participantId = p.userId;
+              return participantId?.toString() === userId;
+            });
             const winner = draw.winners?.[0];
-            const isWinner =
-              winner && winner.userId?.toString() === userId;
+
+            // FIXED: correct winner check (supports both ObjectId and populated object)
+            const isWinner = winner
+              ? (typeof winner.userId === "object"
+                  ? winner.userId._id
+                  : winner.userId
+                ).toString() === userId
+              : false;
 
             return (
               <div
@@ -125,12 +132,10 @@ const LuckyDraw = () => {
                   Participants:{" "}
                   {draw.participants.length}/{draw.participantsLimit}
                 </p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+                 {participatingId}
+                </p>
 
-                {/* <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                  Ends at: {new Date(draw.endDate).toLocaleString()}
-                </p> */}
-
-                {/* BUTTON */}
                 <button
                   disabled={ended || full || joined || participatingId === draw._id}
                   onClick={() => participate(draw._id)}
@@ -155,7 +160,6 @@ const LuckyDraw = () => {
                     : "Participate"}
                 </button>
 
-                {/* WINNER INFO */}
                 {winner && (
                   <div className="mt-6 p-4 rounded-xl bg-green-100 dark:bg-green-900/30">
                     <p className="text-green-700 dark:text-green-400 font-semibold">
