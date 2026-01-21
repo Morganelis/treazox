@@ -33,44 +33,44 @@ const Dashboard = () => {
       ? `${window.location.origin}/signup?ref=${referralCode}`
       : "";
 
-      const handleLogout = () => {
-  Cookies.remove("token");
-  router.replace("/login");
-};
+  const handleLogout = () => {
+    Cookies.remove("token");
+    router.replace("/login");
+  };
   /* ================= FETCH USER ================= */
-    useEffect(() => {
-      if (!token) return;
+  useEffect(() => {
+    if (!token) return;
 
-      const fetchMe = async () => {
-        try {
-          const res = await fetch(`${BASE_URL}/users/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+    const fetchMe = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-          if (res.status === 401) {
-      toast.error("Session expired. Please login again.");
-      handleLogout();
-      return;
-    }
-
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message);
-
-          setDashboard({
-            totalAssets: data.user.totalAssets || 0,
-            availableBalance: data.user.balance || 0,
-            dailyIncome: data.user.dailyIncome || 0,
-          });
-
-          setCommissionBalance(data.user.commissionBalance || 0);
-          setReferralCode(data.user.referralCode || "");
-        } catch (err) {
-          toast.error(err.message || "Failed to load user");
+        if (res.status === 401) {
+          toast.error("Session expired. Please login again.");
+          handleLogout();
+          return;
         }
-      };
 
-      fetchMe();
-    }, [token]);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        setDashboard({
+          totalAssets: data.user.totalAssets || 0,
+          availableBalance: data.user.balance || 0,
+          dailyIncome: data.user.dailyIncome || 0,
+        });
+
+        setCommissionBalance(data.user.commissionBalance || 0);
+        setReferralCode(data.user.referralCode || "");
+      } catch (err) {
+        toast.error(err.message || "Failed to load user");
+      }
+    };
+
+    fetchMe();
+  }, [token]);
 
   /* ================= FETCH REFERRALS ================= */
   // useEffect(() => {
@@ -141,64 +141,81 @@ const Dashboard = () => {
         </h1>
 
         {/* ================= ASSETS ================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <div className="bg-gradient-to-r from-emerald-300 via-teal-100 to-cyan-500
+      hover:from-cyan-500 hover:via-teal-500 hover:to-emerald-400
+      transition-all duration-700 ease-out
+      hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
           <p className="text-gray-500">Total Assets</p>
-         <h2 className="text-3xl font-bold text-green-600 mb-6">
-  ${Number(dashboard.availableBalance).toFixed(2)}
-</h2>
-         <div className="grid grid-cols-2 gap-4 mb-6">
-  {/* Available Balance */}
-  <div
-    className="
+          <h2 className="text-3xl font-bold text-green-600 mb-6">
+            ${Number(dashboard.availableBalance).toFixed(2)}
+          </h2>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Available Balance */}
+            <div
+              className="
       p-5 rounded-lg
       bg-gradient-to-br from-green-50 to-green-100
       dark:from-green-900/30 dark:to-green-800/30
       shadow-sm
       transition
     "
-  >
-    <p className="text-sm text-gray-600 dark:text-gray-400">
-      Available Balance
-    </p>
-    <p className="text-xl font-semibold text-green-600">
-      ${Number(dashboard.availableBalance).toFixed(2)}
-    </p>
-  </div>
+            >
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Available Balance
+              </p>
+              <p className="text-xl font-semibold text-green-600">
+                ${Number(dashboard.availableBalance).toFixed(2)}
+              </p>
+            </div>
 
-  {/* Team Income */}
-  <div
-    className="
+            {/* Team Income */}
+            <div
+              className="
       p-5 rounded-lg
       bg-gradient-to-br from-blue-50 to-blue-100
       dark:from-blue-900/30 dark:to-blue-800/30
       shadow-sm
       transition
     "
-  >
-    <p className="text-sm text-gray-600 dark:text-gray-400">
-      Team Income
-    </p>
-    <p className="text-xl font-semibold text-blue-600">
-      ${commissionBalance}
-    </p>
-  </div>
-</div>
+            >
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Team Income
+              </p>
+              <p className="text-xl font-semibold text-blue-600">
+                ${commissionBalance}
+              </p>
+            </div>
+          </div>
 
 
           <div className="flex gap-3">
-            <button
-              onClick={() => router.push("/deposit")}
-              className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-600/60 hover:-translate-y-3  duration-1000"
-            >
-              Deposit
-            </button>
-            <button
-              onClick={() => router.push("/withdraw")}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-600/60 hover:-translate-y-3  duration-1000"
-            >
-              Withdraw
-            </button>
-          </div>
+  <button
+    onClick={() => router.push("/deposit")}
+    className="
+      w-full py-3 text-white rounded-lg
+      bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      hover:from-cyan-500 hover:via-teal-500 hover:to-emerald-400
+      transition-all duration-700 ease-out
+      hover:-translate-y-2 hover:shadow-xl
+    "
+  >
+    Deposit
+  </button>
+
+  <button
+    onClick={() => router.push("/withdraw")}
+    className="
+      w-full py-3 text-white rounded-lg
+      bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+      hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500
+      transition-all duration-700 ease-out
+      hover:-translate-y-2 hover:shadow-xl
+    "
+  >
+    Withdraw
+  </button>
+</div>
+
         </div>
 
         {/* ================= TABS ================= */}
@@ -226,7 +243,7 @@ const Dashboard = () => {
         </div>
 
         {/* ================= TABLE ================= */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto">
 
           {activeTab === "account" && (
             <HistoryTable
@@ -325,8 +342,8 @@ const HistoryTable = ({ title, data, activeTab }) => (
                   {activeTab === "account"
                     ? item.type
                     : activeTab === "withdraw"
-                    ? "Withdraw"
-                    : "Lucky Draw"}
+                      ? "Withdraw"
+                      : "Lucky Draw"}
                 </td>
 
                 <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
@@ -336,10 +353,9 @@ const HistoryTable = ({ title, data, activeTab }) => (
                 <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
                   <span
                     className={`text-xs font-semibold
-                      ${
-                        ["completed", "success","credited" ,"approved","won"].includes(status)
-                          ? "text-green-600"
-                          : ["pending", "processing"].includes(status)
+                      ${["completed", "success", "credited", "approved", "won"].includes(status)
+                        ? "text-green-600"
+                        : ["pending", "processing"].includes(status)
                           ? "text-orange-500"
                           : "text-red-500"
                       }`}
