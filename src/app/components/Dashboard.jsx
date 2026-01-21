@@ -6,7 +6,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { Copy, FileText, Wallet, Gift } from "lucide-react";
 import Cookies from "js-cookie";
 
-const BASE_URL = "https://treazoxbackend.vercel.app/api";
+const BASE_URL = "https://treazoxbe.vercel.app/api";
 
 const Dashboard = () => {
   const router = useRouter();

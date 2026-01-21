@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 const LUCKYDRAW_URL =
-  "https://treazoxbackend.vercel.app/api/luckydraw/withoutlogin";
+  "https://treazoxbe.vercel.app/api/luckydraw/withoutlogin";
 
 const DrawsOnWithoutToken = () => {
   const [draws, setDraws] = useState([]);

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-const BASE_URL = "https://treazoxbackend.vercel.app/api/plans/withoutlogin";
+const BASE_URL = "https://treazoxbe.vercel.app/api/plans/withoutlogin";
 
 const InvestmentPlans = () => {
   const [plansData, setPlansData] = useState([]);

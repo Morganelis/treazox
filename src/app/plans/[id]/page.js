@@ -27,7 +27,7 @@ export default function PlanDetail() {
 
     try {
       const res = await fetch(
-        "https://treazoxbackend.vercel.app/api/investment/",
+        "https://treazoxbe.vercel.app/api/investment/",
         {
           method: "POST",
           headers: {

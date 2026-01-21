@@ -6,7 +6,7 @@ import { FaArrowRight } from "react-icons/fa";
 import { Toaster, toast } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const BACKEND_URL = "https://treazoxbackend.vercel.app/api/plans/all"; // User route
+const BACKEND_URL = "https://treazoxbe.vercel.app/api/plans/all"; // User route
 
 export default function Plans() {
   const router = useRouter();
