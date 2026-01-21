@@ -114,11 +114,8 @@ const LuckyDraw = () => {
             return (
               <div
                 key={draw._id}
-                className="rounded-2xl p-6 bg-white dark:bg-gray-800
-                           ring-1 ring-gray-200 dark:ring-gray-700
-                           shadow-[0_20px_40px_rgba(0,0,0,0.12)]
-                           dark:shadow-[0_20px_40px_rgba(0,0,0,0.45)]
-                           transition"
+                className="rounded-2xl p-6 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out"
               >
                 <h3 className="text-xl font-bold text-primary dark:text-white mb-3">
                   🎁 Prize: ${draw.winningPrice}
@@ -161,7 +158,8 @@ const LuckyDraw = () => {
                 </button>
 
                 {winner && (
-                  <div className="mt-6 p-4 rounded-xl bg-green-100 dark:bg-green-900/30">
+                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-green-900/30">
                     <p className="text-green-700 dark:text-green-400 font-semibold">
                       Winner:
                     </p>
