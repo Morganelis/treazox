@@ -141,7 +141,7 @@ const Dashboard = () => {
         </h1>
 
         {/* ================= ASSETS ================= */}
-        <div className="bg-gradient-to-r from-emerald-300 via-teal-100 to-cyan-500
+        <div className="bg-gradient-to-r from-emerald-300 via-teal-500 to-cyan-500
       hover:from-cyan-500 hover:via-teal-500 hover:to-emerald-400
       transition-all duration-700 ease-out
       hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
@@ -231,8 +231,8 @@ const Dashboard = () => {
               onClick={() => setActiveTab(id)}
               className={`p-4 rounded-lg shadow flex flex-col items-center gap-1 transition-colors duration-200 
         ${activeTab === id
-                  ? "border border-green-300 text-green-500 bg-white dark:bg-gray-800"
-                  : "bg-white dark:bg-gray-800 text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ? "border border-green-300 text-primarys bg-gradient-to-r from-emerald-300 via-teal-500 to-cyan-500 hover:from-cyan-500 hover:via-teal-500 hover:to-emerald-400 transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800"
+                  : " bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800 text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                 }
       `}
             >
@@ -272,7 +272,10 @@ const Dashboard = () => {
         </div>
 
         {/* ================= REFERRAL ================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-8">
+        <div className="bg-gradient-to-r from-emerald-300 via-teal-500 to-cyan-500
+      hover:from-cyan-500 hover:via-teal-500 hover:to-emerald-400
+      transition-all duration-700 ease-out
+      hover:-translate-y-2 hover:shadow-xl dark:bg-gray-800 rounded-lg shadow p-6 mt-8">
           <p className="text-sm text-gray-500 mb-1">Your Referral Code</p>
           <p className="font-mono text-green-500 mb-4">{referralCode}</p>
 
