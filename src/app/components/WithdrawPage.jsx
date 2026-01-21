@@ -89,13 +89,15 @@ const WithdrawPage = () => {
         <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Withdraw Funds</h1>
 
         {/* Balance */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+        <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
           <p className="text-gray-500">Available Balance</p>
           <h2 className="text-3xl font-bold text-green-600">${balance}</h2>
         </div>
 
         {/* Amount Selection */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+        <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
           <p className="text-gray-500 mb-2">Select Withdraw Amount</p>
           <div className="flex flex-wrap gap-3 mb-4">
             {WITHDRAW_OPTIONS.map((amt) => (
@@ -129,7 +131,8 @@ const WithdrawPage = () => {
 
         {/* Fee Info */}
         {withdrawAmount > 0 && (
-          <div className="bg-yellow-100 dark:bg-gray-800 rounded-xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-xl p-4 mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-300">
               Withdraw Fee (10%): <span className="font-semibold">${fee}</span>
             </p>
@@ -140,7 +143,8 @@ const WithdrawPage = () => {
         )}
 
         {/* Exchange & Network */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
+        <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out dark:bg-gray-800 rounded-xl shadow p-6 mb-6">
           <p className="text-gray-500 mb-2">Select Exchange</p>
           <div className="flex flex-wrap gap-3 mb-4">
             {EXCHANGES.map((ex) => (
@@ -187,7 +191,10 @@ const WithdrawPage = () => {
 
         <button
           onClick={handleWithdraw}
-          className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+          className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+      hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500
+      transition-all duration-700 ease-out
+      hover:-translate-y-2 hover:shadow-xl text-white rounded-lg hover:bg-green-700 "
         >
           Confirm Withdraw
         </button>
