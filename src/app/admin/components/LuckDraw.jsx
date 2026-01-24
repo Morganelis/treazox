@@ -10,8 +10,7 @@ const LuckyDrawAdmin = () => {
   const [formData, setFormData] = useState({
     buyPrice: "",
     winningPrice: "",
-    participantsLimit: "",
-    endDate: "",
+    participantsLimit: ""
   });
 
   const LUCKYDRAW_URL = "https://treazoxbe.vercel.app/api/luckydraw/";
@@ -45,8 +44,8 @@ const LuckyDrawAdmin = () => {
 
   /* ================= CREATE ================= */
   const handleSubmit = async () => {
-    const { buyPrice, winningPrice, participantsLimit, endDate } = formData;
-    if (!buyPrice || !winningPrice || !participantsLimit || !endDate) {
+    const { buyPrice, winningPrice, participantsLimit} = formData;
+    if (!buyPrice || !winningPrice || !participantsLimit) {
       toast.error("All fields are required");
       return;
     }
@@ -56,7 +55,7 @@ const LuckyDrawAdmin = () => {
         buyPrice,
         winningPrice,
         participantsLimit,
-        endDate,
+        // endDate,
       };
 
       const res = await fetch(LUCKYDRAW_URL, {
@@ -73,7 +72,7 @@ const LuckyDrawAdmin = () => {
 
       toast.success("Lucky Draw created successfully!");
       setShowModal(false);
-      setFormData({ buyPrice: "", winningPrice: "", participantsLimit: "", endDate: "" });
+      setFormData({ buyPrice: "", winningPrice: "", participantsLimit: "" });
       fetchLuckyDraws();
     } catch (err) {
       toast.error(err.message || "Failed to create lucky draw");
@@ -197,14 +196,14 @@ const LuckyDrawAdmin = () => {
                 value={formData.participantsLimit}
                 onChange={handleChange}
               />
-              <input
+              {/* <input
                 type="datetime-local"
                 name="endDate"
                 placeholder="End Date & Time"
                 className="w-full px-3 py-2 border rounded"
                 value={formData.endDate}
                 onChange={handleChange}
-              />
+              /> */}
             </div>
 
             <div className="flex justify-end gap-3 mt-5">
