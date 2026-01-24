@@ -90,14 +90,14 @@ const Navbar = () => {
               <>
                 {/* Notifications */}
                 <div className="relative">
-                  {/* <button
+                  <button
                     onClick={() =>
                       setShowNotifications(!showNotifications)
                     }
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <Bell size={20} color={iconColor} />
-                  </button> */}
+                  </button>
 
                   {showNotifications && (
                     <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-50">

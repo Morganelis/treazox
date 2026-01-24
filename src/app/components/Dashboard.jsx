@@ -361,7 +361,7 @@ const HistoryTable = ({ title, data, activeTab }) => (
                 <td className="border border-gray-200 dark:border-gray-700 px-3 py-2">
                   <span
                     className={`text-xs font-semibold
-                      ${["completed", "success", "credited", "approved", "Won"].includes(status)
+                      ${["completed", "success", "credited", "approved", "won"].includes(status)
                         ? "text-green-600"
                         : ["pending", "processing"].includes(status)
                           ? "text-orange-500"
