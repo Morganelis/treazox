@@ -35,8 +35,7 @@ export default function PlanDetail() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            planId,
-            exchange: "wallet",
+            planId
           }),
         }
       );
