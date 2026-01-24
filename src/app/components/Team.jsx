@@ -81,7 +81,8 @@ const Team = () => {
         </div>
 
         {/* Tab content */}
-        <div>
+        <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500
+      transition-all duration-700 ease-out">
           {levels[activeTab] && levels[activeTab].map(renderMember)}
           {!levels[activeTab] && (
             <p className="text-gray-500 dark:text-gray-400">
