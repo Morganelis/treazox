@@ -59,7 +59,7 @@ export default function Plans() {
     <div className="min-h-screen bg-gray-100 dark:bg-primary mx-auto p-5">
       <Toaster position="top-right" />
       <h1 className="text-3xl font-bold text-center text-primary dark:text-white mb-8">
-        Our Investment Plans
+       Investment Plans for Every Goal
       </h1>
 
       <div className="max-w-[1170px] mx-auto">
@@ -79,7 +79,7 @@ export default function Plans() {
              "
 >
                 <h2 className="text-xl font-bold text-primary dark:text-white text-center mb-4">
-                  Plan {index + 1}
+                 Elite Plan {index + 1}
                 </h2>
 
                 <div className="space-y-4 bg-white/70 dark:bg-gray-900/90 
