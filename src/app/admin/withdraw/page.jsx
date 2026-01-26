@@ -4,6 +4,9 @@ import React, { useEffect, useState } from "react";
 import Withdraw from "../components/Withdraw";
 
 const Page = () => {
+  const BACKEND_URL =
+    "https://treazoxbe.vercel.app/api/withdraw/admin/dashboard/stats";
+
   const [withdrawStats, setWithdrawStats] = useState({
     totalBalance: 0,
     pending: 0,
@@ -11,26 +14,74 @@ const Page = () => {
     rejected: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+
+  // Get token from JS cookies
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return null;
+    const cookies = document.cookie.split("; ");
+    const cookie = cookies.find((row) => row.startsWith(name + "="));
+    return cookie ? cookie.split("=")[1] : null;
+  };
+
   useEffect(() => {
-    // Hardcoded stats for now, can be replaced with API
-    setWithdrawStats({
-      totalBalance: 12450,
-      pending: 2100,
-      approved: 6500,
-      rejected: 850,
-    });
+    const fetchWithdrawStats = async () => {
+      try {
+        const token = getCookie("token");
+
+        const res = await fetch(BACKEND_URL, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setWithdrawStats({
+            totalBalance: data.totalWithdrawAmount,
+            pending: data.pendingWithdraws,
+            approved: data.approvedWithdraws,
+            rejected: data.rejectedWithdraws,
+          });
+        }
+      } catch (err) {
+        console.error("Withdraw stats error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWithdrawStats();
   }, []);
 
   const cards = [
-    { title: "Total Balance", value: `$${withdrawStats.totalBalance}`, color: "bg-blue-500" },
-    { title: "Pending Withdraw", value: `$${withdrawStats.pending}`, color: "bg-yellow-500" },
-    { title: "Approved Withdraw", value: `$${withdrawStats.approved}`, color: "bg-green-500" },
-    { title: "Rejected Withdraw", value: `$${withdrawStats.rejected}`, color: "bg-red-500" },
+    {
+      title: "Total Balance",
+      value: `$${withdrawStats.totalBalance.toLocaleString()}`,
+      color: "bg-blue-600",
+    },
+    {
+      title: "Pending Withdraw",
+      value: `$${withdrawStats.pending.toLocaleString()}`,
+      color: "bg-yellow-600",
+    },
+    {
+      title: "Approved Withdraw",
+      value: `$${withdrawStats.approved.toLocaleString()}`,
+      color: "bg-green-600",
+    },
+    {
+      title: "Rejected Withdraw",
+      value: `$${withdrawStats.rejected.toLocaleString()}`,
+      color: "bg-red-600",
+    },
   ];
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+    <div className="p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         Withdraw Overview
       </h1>
 
@@ -39,10 +90,14 @@ const Page = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`p-6 rounded-lg shadow-lg text-white ${card.color} flex flex-col justify-between`}
+            className={`p-6 rounded-xl shadow-lg text-white ${card.color}`}
           >
-            <h2 className="text-lg font-medium">{card.title}</h2>
-            <p className="mt-4 text-2xl font-bold">{card.value}</p>
+            <h2 className="text-sm uppercase tracking-wide opacity-90">
+              {card.title}
+            </h2>
+            <p className="mt-3 text-2xl sm:text-3xl font-bold">
+              {loading ? "Loading..." : card.value}
+            </p>
           </div>
         ))}
       </div>
