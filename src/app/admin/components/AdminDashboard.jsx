@@ -15,7 +15,6 @@ import {
 } from "recharts";
 
 const AdminDashboard = () => {
-  // Dummy state
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalInvestments: 0,
@@ -23,49 +22,40 @@ const AdminDashboard = () => {
     luckyDraws: 0,
   });
 
-  // Dummy chart data
   const [investmentData, setInvestmentData] = useState([]);
   const [activeUserData, setActiveUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setStats({
-      totalUsers: 1250,
-      totalInvestments: 452000,
-      activeUsers: 980,
-      luckyDraws: 320,
-    });
+    const fetchOverview = async () => {
+      try {
+        const res = await fetch(
+          "https://treazoxbe.vercel.app/api/users/admin/dashboardOverview"
+        );
 
-    // Dummy investment data
-    setInvestmentData([
-      { month: "Jan", investments: 40000 },
-      { month: "Feb", investments: 32000 },
-      { month: "Mar", investments: 50000 },
-      { month: "Apr", investments: 45000 },
-      { month: "May", investments: 60000 },
-      { month: "Jun", investments: 70000 },
-      { month: "Jul", investments: 80000 },
-      { month: "Aug", investments: 65000 },
-      { month: "Sep", investments: 72000 },
-      { month: "Oct", investments: 90000 },
-      { month: "Nov", investments: 85000 },
-      { month: "Dec", investments: 95000 },
-    ]);
+        const data = await res.json();
 
-    // Dummy active user data
-    setActiveUserData([
-      { month: "Jan", users: 650 },
-      { month: "Feb", users: 700 },
-      { month: "Mar", users: 750 },
-      { month: "Apr", users: 800 },
-      { month: "May", users: 820 },
-      { month: "Jun", users: 850 },
-      { month: "Jul", users: 870 },
-      { month: "Aug", users: 900 },
-      { month: "Sep", users: 920 },
-      { month: "Oct", users: 940 },
-      { month: "Nov", users: 960 },
-      { month: "Dec", users: 980 },
-    ]);
+        if (data.success) {
+          // set cards
+          setStats({
+            totalUsers: data.totalUsers,
+            totalInvestments: data.totalInvestments,
+            activeUsers: data.activeUsers,
+            luckyDraws: data.luckyDraws,
+          });
+
+          // set charts
+          setInvestmentData(data.investmentData);
+          setActiveUserData(data.activeUserData);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOverview();
   }, []);
 
   const cards = [
@@ -105,7 +95,9 @@ const AdminDashboard = () => {
             className={`p-6 rounded-lg shadow-lg text-white ${card.color} flex flex-col justify-between`}
           >
             <h2 className="text-lg font-medium">{card.title}</h2>
-            <p className="mt-4 text-2xl font-bold">{card.value}</p>
+            <p className="mt-4 text-2xl font-bold">
+              {loading ? "Loading..." : card.value}
+            </p>
           </div>
         ))}
       </div>
