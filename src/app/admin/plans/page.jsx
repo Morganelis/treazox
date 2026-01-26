@@ -48,7 +48,7 @@ const Page = () => {
     { title: "Active Plans", value: stats.activePlans, color: "bg-green-500" },
     { title: "Inactive Plans", value: stats.inactivePlans, color: "bg-gray-500" },
     {
-      title: "Daily Earning of all Plans",
+      title: "Earning of all Plans",
       value: `$${Number(stats.totalDailyEarning).toFixed(2)}`,
       color: "bg-yellow-500"
     },
