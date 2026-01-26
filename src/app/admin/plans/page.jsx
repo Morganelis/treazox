@@ -14,10 +14,24 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const BACKEND_URL = "https://treazoxbe.vercel.app/api/plans/stats";
 
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return null;
+    const cookies = document.cookie.split("; ");
+    const cookie = cookies.find((row) => row.startsWith(name + "="));
+    return cookie ? cookie.split("=")[1] : null;
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(BACKEND_URL);
+        const token = getCookie("token"); // GET TOKEN FROM COOKIE
+
+        const res = await fetch(BACKEND_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         const data = await res.json();
         if (data.success) setStats(data.stats);
       } catch (err) {
@@ -42,7 +56,7 @@ const Page = () => {
         Admin Plans
       </h1>
 
-      <div className="grid grid-cols-1  sm:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
         {cards.map((card, index) => (
           <div
             key={index}
