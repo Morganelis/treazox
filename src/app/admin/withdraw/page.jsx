@@ -10,7 +10,7 @@ const Page = () => {
   const [withdrawStats, setWithdrawStats] = useState({
     totalBalance: 0,
     pending: 0,
-    approved: 0,
+    completed: 0,
     rejected: 0,
   });
 
@@ -29,6 +29,12 @@ const Page = () => {
       try {
         const token = getCookie("token");
 
+        if (!token) {
+          console.log("Token not found");
+          setLoading(false);
+          return;
+        }
+
         const res = await fetch(BACKEND_URL, {
           headers: {
             "Content-Type": "application/json",
@@ -40,10 +46,10 @@ const Page = () => {
 
         if (data.success) {
           setWithdrawStats({
-            totalBalance: data.totalWithdrawAmount,
-            pending: data.pendingWithdraws,
-            approved: data.approvedWithdraws,
-            rejected: data.rejectedWithdraws,
+            totalBalance: data.totalWithdrawAmount || 0,
+            pending: data.pendingWithdraws || 0,
+            completed: data.completedWithdraws || 0,
+            rejected: data.rejectedWithdraws || 0,
           });
         }
       } catch (err) {
@@ -68,8 +74,8 @@ const Page = () => {
       color: "bg-yellow-600",
     },
     {
-      title: "Approved Withdraw",
-      value: `$${withdrawStats.approved.toLocaleString()}`,
+      title: "Completed Withdraw",
+      value: `$${withdrawStats.completed.toLocaleString()}`,
       color: "bg-green-600",
     },
     {
