@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import {
   LineChart,
   Line,
@@ -29,14 +30,20 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchOverview = async () => {
       try {
+        const token = Cookies.get("token"); // get token from cookies
+
         const res = await fetch(
-          "https://treazoxbe.vercel.app/api/users/admin/dashboardOverview"
+          "https://treazoxbe.vercel.app/api/users/admin/dashboardOverview",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // attach token here
+            },
+          }
         );
 
         const data = await res.json();
 
         if (data.success) {
-          // set cards
           setStats({
             totalUsers: data.totalUsers,
             totalInvestments: data.totalInvestments,
@@ -44,7 +51,6 @@ const AdminDashboard = () => {
             luckyDraws: data.luckyDraws,
           });
 
-          // set charts
           setInvestmentData(data.investmentData);
           setActiveUserData(data.activeUserData);
         }
