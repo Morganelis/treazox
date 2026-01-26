@@ -8,7 +8,7 @@ const Page = () => {
     totalPlans: 0,
     activePlans: 0,
     inactivePlans: 0,
-    totalInvestment: 0
+    totalDailyEarning: 0
   });
 
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ const Page = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = getCookie("token"); // GET TOKEN FROM COOKIE
+        const token = getCookie("token");
 
         const res = await fetch(BACKEND_URL, {
           headers: {
@@ -47,7 +47,11 @@ const Page = () => {
     { title: "Total Plans", value: stats.totalPlans, color: "bg-blue-500" },
     { title: "Active Plans", value: stats.activePlans, color: "bg-green-500" },
     { title: "Inactive Plans", value: stats.inactivePlans, color: "bg-gray-500" },
-    { title: "Total Investment", value: `$${stats.totalInvestment}`, color: "bg-yellow-500" },
+    {
+      title: "Daily Earning of all Plans",
+      value: `$${Number(stats.totalDailyEarning).toFixed(2)}`,
+      color: "bg-yellow-500"
+    },
   ];
 
   return (
