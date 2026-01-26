@@ -182,7 +182,7 @@ const Allusers = () => {
                   <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{user.fullName}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">{user.email}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">{user.role}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">{user.active ? "Active" : "Inactive"}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">{user.isActive ? "Active" : "Inactive"}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-center flex justify-center gap-2">
                     <button onClick={() => openForm(user)} className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
                     <button onClick={() => openPasswordForm(user)} className="px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600">Change Password</button>
