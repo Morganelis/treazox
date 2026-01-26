@@ -3,17 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  CartesianGrid,
-  Legend,
-} from "recharts";
+  UserGroupIcon,
+  CurrencyDollarIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  RefreshIcon,
+} from "@heroicons/react/24/outline";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -23,20 +18,19 @@ const AdminDashboard = () => {
     luckyDraws: 0,
   });
 
-  const [investmentData, setInvestmentData] = useState([]);
-  const [activeUserData, setActiveUserData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const fetchOverview = async () => {
       try {
-        const token = Cookies.get("token"); // get token from cookies
+        const token = Cookies.get("token");
 
         const res = await fetch(
           "https://treazoxbe.vercel.app/api/users/admin/dashboardOverview",
           {
             headers: {
-              Authorization: `Bearer ${token}`, // attach token here
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -51,8 +45,8 @@ const AdminDashboard = () => {
             luckyDraws: data.luckyDraws,
           });
 
-          setInvestmentData(data.investmentData);
-          setActiveUserData(data.activeUserData);
+          const now = new Date();
+          setLastUpdated(now.toLocaleString());
         }
       } catch (err) {
         console.error(err);
@@ -68,80 +62,69 @@ const AdminDashboard = () => {
     {
       title: "Total Users",
       value: stats.totalUsers,
-      color: "bg-blue-500",
+      icon: <UserGroupIcon className="w-7 h-7" />,
+      color: "from-blue-500 to-indigo-500",
     },
     {
       title: "Total Investments",
       value: `$${stats.totalInvestments.toLocaleString()}`,
-      color: "bg-green-500",
+      icon: <CurrencyDollarIcon className="w-7 h-7" />,
+      color: "from-green-500 to-emerald-500",
     },
     {
       title: "Active Users",
       value: stats.activeUsers,
-      color: "bg-yellow-500",
+      icon: <CheckCircleIcon className="w-7 h-7" />,
+      color: "from-yellow-400 to-yellow-600",
     },
     {
       title: "Lucky Draw Participation",
       value: stats.luckyDraws,
-      color: "bg-purple-500",
+      icon: <SparklesIcon className="w-7 h-7" />,
+      color: "from-purple-500 to-pink-500",
     },
   ];
 
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        Admin Dashboard
-      </h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Admin Dashboard
+        </h1>
+
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Last updated: {lastUpdated || "Loading..."}
+          </span>
+          <RefreshIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+        </div>
+      </div>
 
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`p-6 rounded-lg shadow-lg text-white ${card.color} flex flex-col justify-between`}
+            className={`p-6 rounded-xl shadow-lg text-white bg-gradient-to-r ${card.color} hover:scale-[1.02] transition transform`}
           >
-            <h2 className="text-lg font-medium">{card.title}</h2>
-            <p className="mt-4 text-2xl font-bold">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-medium">{card.title}</h2>
+              <div className="p-2 bg-white/20 rounded-full">
+                {card.icon}
+              </div>
+            </div>
+
+            <p className="mt-6 text-3xl font-bold">
               {loading ? "Loading..." : card.value}
             </p>
+
+            <div className="mt-4 text-sm text-white/80">
+              <span className="inline-block px-2 py-1 bg-white/20 rounded-full">
+                Updated just now
+              </span>
+            </div>
           </div>
         ))}
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Line Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
-          <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-            Investments Growth (Line Chart)
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={investmentData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="investments" stroke="#1f2937" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Bar Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
-          <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-            Active Users (Bar Chart)
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={activeUserData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="users" fill="#4b5563" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
       </div>
     </div>
   );
