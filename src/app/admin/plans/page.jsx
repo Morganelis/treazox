@@ -12,7 +12,7 @@ const Page = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const BACKEND_URL = "https://treazoxbe.vercel.app/api/plan/stats";
+  const BACKEND_URL = "https://treazoxbe.vercel.app/api/plans/stats";
 
   useEffect(() => {
     const fetchStats = async () => {
