@@ -4,32 +4,84 @@ import React, { useEffect, useState } from "react";
 import DepositPage from "../components/DepositPage";
 
 const page = () => {
-     const [depositStats, setDepositStats] = useState({
-        totalBalance: 0,
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-      });
-    
-      useEffect(() => {
-        // Hardcoded stats for now, can be replaced with API
-        setDepositStats({
-          totalBalance: 12450,
-          pending: 2100,
-          approved: 6500,
-          rejected: 850,
+  const BACKEND_URL =
+    "https://treazoxbe.vercel.app/api/deposit/admin/dashboard/stats";
+
+  const [depositStats, setDepositStats] = useState({
+    totalBalance: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  // Get token from JS cookies
+  const getCookie = (name) => {
+    if (typeof document === "undefined") return null;
+    const cookies = document.cookie.split("; ");
+    const cookie = cookies.find((row) => row.startsWith(name + "="));
+    return cookie ? cookie.split("=")[1] : null;
+  };
+
+  useEffect(() => {
+    const fetchDepositStats = async () => {
+      try {
+        const token = getCookie("token");
+
+        const res = await fetch(BACKEND_URL, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         });
-      }, []);
-    
-      const cards = [
-        { title: "Total Balance", value: `$${depositStats.totalBalance}`, color: "bg-blue-500" },
-        { title: "Pending Deposits", value: `$${depositStats.pending}`, color: "bg-yellow-500" },
-        { title: "Approved Deposits", value: `$${depositStats.approved}`, color: "bg-green-500" },
-        { title: "Rejected Deposits", value: `$${depositStats.rejected}`, color: "bg-red-500" },
-      ];
+
+        const data = await res.json();
+
+        if (data.success) {
+          setDepositStats({
+            totalBalance: data.totalDepositAmount,
+            pending: data.pendingDeposits,
+            approved: data.approvedDeposits,
+            rejected: data.rejectedDeposits,
+          });
+        }
+      } catch (err) {
+        console.error("Deposit stats error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepositStats();
+  }, []);
+
+  const cards = [
+    {
+      title: "Total Balance",
+      value: `$${depositStats.totalBalance.toLocaleString()}`,
+      color: "bg-blue-600",
+    },
+    {
+      title: "Pending Deposits",
+      value: `$${depositStats.pending.toLocaleString()}`,
+      color: "bg-yellow-600",
+    },
+    {
+      title: "Approved Deposits",
+      value: `$${depositStats.approved.toLocaleString()}`,
+      color: "bg-green-600",
+    },
+    {
+      title: "Rejected Deposits",
+      value: `$${depositStats.rejected.toLocaleString()}`,
+      color: "bg-red-600",
+    },
+  ];
+
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+    <div className="p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         Deposit Overview
       </h1>
 
@@ -38,17 +90,22 @@ const page = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`p-6 rounded-lg shadow-lg text-white ${card.color} flex flex-col justify-between`}
+            className={`p-6 rounded-xl shadow-lg text-white ${card.color}`}
           >
-            <h2 className="text-lg font-medium">{card.title}</h2>
-            <p className="mt-4 text-2xl font-bold">{card.value}</p>
+            <h2 className="text-sm uppercase tracking-wide opacity-90">
+              {card.title}
+            </h2>
+            <p className="mt-3 text-2xl sm:text-3xl font-bold">
+              {loading ? "Loading..." : card.value}
+            </p>
           </div>
         ))}
       </div>
 
-     <DepositPage/>
+      {/* Deposit Table */}
+      <DepositPage />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;
