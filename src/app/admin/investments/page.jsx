@@ -10,6 +10,7 @@ const Page = () => {
 
   const [stats, setStats] = useState({
     totalInvestmentAmount: 0,
+    totalInvestments:0,
     activeInvestments: 0,
   });
     const token = Cookies.get("token");
@@ -51,6 +52,11 @@ const Page = () => {
       color: "bg-green-600",
     },
     {
+      title: " totalInvestments",
+      value: stats.totalInvestments,
+      color: "bg-blue-400",
+    },
+    {
       title: "Active Investments",
       value: stats.activeInvestments,
       color: "bg-blue-600",
@@ -64,7 +70,7 @@ const Page = () => {
       </h1>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
         {cards.map((card, index) => (
           <div
             key={index}
