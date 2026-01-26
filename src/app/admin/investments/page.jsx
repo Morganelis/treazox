@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 
 const Page = () => {
   const BACKEND_URL =
-    "https://treazoxbe.vercel.app/api/investment/getAdminDashboardStats";
+    "https://treazoxbe.vercel.app/api/investment/admin/dashboard/stats";
 
   const [stats, setStats] = useState({
     totalInvestmentAmount: 0,
