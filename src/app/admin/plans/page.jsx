@@ -1,28 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Plans from "../components/Plans";
 
 const Page = () => {
-  // ======================
-  // Dummy Stats
-  // ======================
-  const [stats] = useState({
-    totalPlans: 5,
-    activePlans: 3,
+  const [stats, setStats] = useState({
+    totalPlans: 0,
+    activePlans: 0,
+    inactivePlans: 0,
+    totalInvestment: 0
   });
 
+  const [loading, setLoading] = useState(true);
+  const BACKEND_URL = "https://treazoxbe.vercel.app/api/plan/stats";
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(BACKEND_URL);
+        const data = await res.json();
+        if (data.success) setStats(data.stats);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const cards = [
-    {
-      title: "Total Plans",
-      value: stats.totalPlans,
-      color: "bg-blue-500",
-    },
-    {
-      title: "Active Plans",
-      value: stats.activePlans,
-      color: "bg-green-500",
-    },
+    { title: "Total Plans", value: stats.totalPlans, color: "bg-blue-500" },
+    { title: "Active Plans", value: stats.activePlans, color: "bg-green-500" },
+    { title: "Inactive Plans", value: stats.inactivePlans, color: "bg-gray-500" },
+    { title: "Total Investment", value: `$${stats.totalInvestment}`, color: "bg-yellow-500" },
   ];
 
   return (
@@ -31,14 +42,16 @@ const Page = () => {
         Admin Plans
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {cards.map((card, index) => (
           <div
             key={index}
             className={`p-6 rounded-lg shadow-lg text-white ${card.color} flex flex-col justify-between`}
           >
             <h2 className="text-lg font-medium">{card.title}</h2>
-            <p className="mt-4 text-2xl font-bold">{card.value}</p>
+            <p className="mt-4 text-2xl font-bold">
+              {loading ? "Loading..." : card.value}
+            </p>
           </div>
         ))}
       </div>
