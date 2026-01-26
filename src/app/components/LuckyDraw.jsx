@@ -124,14 +124,14 @@ const LuckyDraw = () => {
                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
                   Entry Fee: <span className="font-semibold">${draw.buyPrice}</span>
                 </p>
-
+{/* 
                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
                   Participants:{" "}
                   {draw.participants.length}/{draw.participantsLimit}
-                </p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+                </p> */}
+                {/* <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
                  {participatingId}
-                </p>
+                </p> */}
 
                 <button
                   disabled={ended || full || joined || participatingId === draw._id}
