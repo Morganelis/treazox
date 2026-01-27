@@ -138,7 +138,7 @@ const handleStatusUpdate = async (invId, status) => {
               <th className="px-4 py-2 text-left text-xs font-medium uppercase">Email</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase">Amount</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase">Daily Earning</th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase">Deposit Exchange</th>
+              {/* <th className="px-4 py-2 text-left text-xs font-medium uppercase">Deposit Exchange</th> */}
               <th className="px-4 py-2 text-left text-xs font-medium uppercase">Trx Id</th>
               <th className="px-4 py-2 text-center text-xs font-medium uppercase">Actions</th>
             </tr>
@@ -159,7 +159,7 @@ const handleStatusUpdate = async (invId, status) => {
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.user?.email}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${inv.price}</td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${inv.dailyEarning}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.exchange}</td>
+                  {/* <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.exchange}</td> */}
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{inv.trxId}</td>
                   <td className="px-4 py-2 text-center flex justify-center gap-2">
                     {activeTab === "pending" ? (
