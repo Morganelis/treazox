@@ -20,11 +20,18 @@ const AdminDashboard = () => {
 
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOverview = async () => {
       try {
         const token = Cookies.get("token");
+
+        if (!token) {
+          setError("Token not found. Please login again.");
+          setLoading(false);
+          return;
+        }
 
         const res = await fetch(
           "https://treazoxbe.vercel.app/api/users/admin/dashboardOverview",
@@ -34,6 +41,10 @@ const AdminDashboard = () => {
             },
           }
         );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
 
         const data = await res.json();
 
@@ -45,11 +56,13 @@ const AdminDashboard = () => {
             luckyDraws: data.luckyDraws,
           });
 
-          const now = new Date();
-          setLastUpdated(now.toLocaleString());
+          setLastUpdated(new Date().toLocaleString());
+        } else {
+          throw new Error(data.message || "Something went wrong");
         }
       } catch (err) {
         console.error(err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -87,6 +100,12 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+      {error && (
+        <div className="p-4 bg-red-500 text-white rounded mb-4">
+          {error}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Admin Dashboard
