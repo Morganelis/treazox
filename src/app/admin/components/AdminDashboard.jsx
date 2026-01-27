@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import {
-  UserGroupIcon,
-  CurrencyDollarIcon,
-  CheckCircleIcon,
-  SparklesIcon,
-  RefreshIcon,
-} from "@heroicons/react/24/outline";
+  FaUsers,
+  FaDollarSign,
+  FaCheckCircle,
+  FaMagic,
+  FaSyncAlt,
+} from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -62,25 +62,25 @@ const AdminDashboard = () => {
     {
       title: "Total Users",
       value: stats.totalUsers,
-      icon: <UserGroupIcon className="w-7 h-7" />,
+      icon: <FaUsers className="w-7 h-7" />,
       color: "from-blue-500 to-indigo-500",
     },
     {
       title: "Total Investments",
       value: `$${stats.totalInvestments.toLocaleString()}`,
-      icon: <CurrencyDollarIcon className="w-7 h-7" />,
+      icon: <FaDollarSign className="w-7 h-7" />,
       color: "from-green-500 to-emerald-500",
     },
     {
       title: "Active Users",
       value: stats.activeUsers,
-      icon: <CheckCircleIcon className="w-7 h-7" />,
+      icon: <FaCheckCircle className="w-7 h-7" />,
       color: "from-yellow-400 to-yellow-600",
     },
     {
       title: "Lucky Draw Participation",
       value: stats.luckyDraws,
-      icon: <SparklesIcon className="w-7 h-7" />,
+      icon: <FaMagic className="w-7 h-7" />,
       color: "from-purple-500 to-pink-500",
     },
   ];
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Last updated: {lastUpdated || "Loading..."}
           </span>
-          <RefreshIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <FaSyncAlt className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         </div>
       </div>
 
