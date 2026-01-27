@@ -42,18 +42,16 @@ const AdminDashboard = () => {
           }
         );
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
         const data = await res.json();
 
         if (data.success) {
           setStats({
-            totalUsers: data.totalUsers,
-            totalInvestments: data.totalInvestments,
-            activeUsers: data.activeUsers,
-            luckyDraws: data.luckyDraws,
+            totalUsers: data.totalUsers ?? 0,
+            totalInvestments: data.totalInvestments ?? 0,
+            activeUsers: data.activeUsers ?? 0,
+            luckyDraws: data.luckyDraws ?? 0,
           });
 
           setLastUpdated(new Date().toLocaleString());
@@ -80,7 +78,7 @@ const AdminDashboard = () => {
     },
     {
       title: "Total Investments",
-      value: `$${stats.totalInvestments.toLocaleString()}`,
+      value: `$${Number(stats.totalInvestments || 0).toLocaleString()}`,
       icon: <FaDollarSign className="w-7 h-7" />,
       color: "from-green-500 to-emerald-500",
     },
